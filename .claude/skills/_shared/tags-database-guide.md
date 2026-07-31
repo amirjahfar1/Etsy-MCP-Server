@@ -10,7 +10,7 @@ Read/Write/Edit file tools, never through an `etsy` MCP tool.
 
 ## File location
 
-`../../../etsy-mcp-server/data/tags-database.json`, relative to any skill's
+`../../../data/tags-database.json`, relative to any skill's
 own folder (`.claude/skills/<name>/` or `.agent/skills/<name>/` — both are
 siblings of the project root, so this same relative path resolves to the
 exact same physical file from either location; there is only ever one

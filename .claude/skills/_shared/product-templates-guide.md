@@ -22,7 +22,7 @@ image sourcing.
 ## File location — organized by supplier
 
 One JSON file per product at
-`../../../etsy-mcp-server/data/products/<Supplier Name> products/<product-slug>.json`,
+`../../../data/products/<Supplier Name> products/<product-slug>.json`,
 relative to any skill's own folder (`.claude/skills/<name>/` or
 `.agent/skills/<name>/` — both resolve to the same physical file, nothing to
 keep in sync). Products are grouped into a **per-supplier subfolder** (e.g.

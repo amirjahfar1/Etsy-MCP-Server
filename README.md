@@ -40,8 +40,13 @@ Etsy-Management-System/
 ├── etsy-mcp-server/           # The MCP server (Node.js / TypeScript)
 │   ├── src/index.ts           # ~90 tools across listings, shipping, orders, payments, etc.
 │   ├── oauth-setup.js         # Per-account OAuth 2.0 connection helper (local + remote flows)
-│   ├── accounts.json          # Multi-account credential store (gitignored)
-│   └── data/                  # Tag research DB, saved product templates, listing records (gitignored)
+│   └── accounts.json          # Multi-account credential store (gitignored)
+├── data/                      # Tag research DB, saved product templates, per-account listing records (gitignored)
+├── Add Product/               # Manual pre-listing staging, split by source
+│   ├── AliExpress/            # AliExpress-sourced dropship products + sourcing brief template
+│   ├── Merchize/               # Merchize-sourced embroidered products (SKU sheet required)
+│   └── Custom/                 # In-house/DTG/generic POD products, no named supplier
+├── Shoots/                    # Raw photoshoot images not yet assigned to a product
 ├── .claude/skills/            # 22 agency skills (Claude Code)
 ├── .agent/skills/             # Same 22 skills, mirrored for Google Antigravity
 ├── .mcp.json                  # Registers the `etsy` server + Etsy's hosted `etsy-docs` reference server
@@ -142,6 +147,31 @@ Read-only tools (`get_*`, `find_*`, `search_*`, `list_*`) run freely. Everything
 5. **Wire it into your AI tool** — copy `.mcp.json.example` → `.mcp.json` for Claude Code, or see [CLAUDE.md](CLAUDE.md#deploying-to-google-antigravity) for Google Antigravity setup.
 
 Full setup, multi-account instructions, and every tool's exact parameters are documented in [CLAUDE.md](CLAUDE.md) and [etsy-mcp-server/README.md](etsy-mcp-server/README.md).
+
+---
+
+## Updating to the Latest Version
+
+If you already have this project cloned and running, pull the latest changes any time:
+
+```bash
+git pull origin main
+```
+
+This only touches code, skills, and docs — it's always safe to run. Everything shop-specific (`data/`, `accounts.json`, `.env`, `Add Product/`, `Shoots/`, `.mcp.json`) is gitignored, so a pull never overwrites your credentials, listing records, or staging content.
+
+After pulling, depending on what changed:
+
+- **`etsy-mcp-server/src/index.ts` changed** (a new/fixed tool) — rebuild the server, then restart your Claude Code / Antigravity session so it picks up the new build:
+  ```bash
+  cd etsy-mcp-server
+  npm run build
+  ```
+- **`.claude/skills/` or `.agent/skills/` changed** (a skill playbook updated) — no rebuild needed, but restart your session so the updated skill text is picked up.
+- **`.mcp.json.example` changed** (a new server or env var was added) — your own `.mcp.json` is gitignored and won't update automatically; diff it against the new `.mcp.json.example` and add whatever's new by hand.
+- **If `git pull` reports a conflict** on a file you've customized locally (e.g. you edited a skill yourself), that's expected — resolve it like any normal git conflict, or `git stash` your local edit first if you just want the latest version.
+
+If you've never cloned this project before, see "Getting Started" above instead — this section is for keeping an existing install current, not first-time setup.
 
 ---
 

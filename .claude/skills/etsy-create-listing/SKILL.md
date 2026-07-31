@@ -287,7 +287,7 @@ to inform Step 2's research/copy — the same way any other research source
 feeds the copywriter, nothing more.
 
 Per-field split of responsibility for AliExpress-sourced listings. The
-`AliExpress Products/_template/product-details.txt` handoff file (see its
+`Add Product/AliExpress/_template/product-details.txt` handoff file (see its
 own `RESEARCH`/`IMAGES / VIDEO`/`PRICING` sections) is the standard intake
 format for this — read the whole folder's text files, not just the fixed
 template fields, since the owner may add extra detail outside the template.

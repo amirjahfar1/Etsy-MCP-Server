@@ -2,6 +2,15 @@
 # Copy .mcp.json.example to .mcp.json and fill in your own values.
 .mcp.json
 
+# Local runtime data store — tag research, saved product templates, listing
+# records, cross-account product registry. Shop-specific state, not shareable.
+data/
+
+# Manual pre-listing staging — real product photos/videos/sourcing briefs and
+# raw photoshoot images. Business content, not shareable in a public repo.
+Add Product/
+Shoots/
+
 # Dependencies
 etsy-mcp-server/node_modules/
 

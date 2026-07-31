@@ -34,12 +34,16 @@ can add it later" is not an exception; get it now or don't create the listing ye
 - **Image count/order — soft standard, not a hard block.** Target **8-10 images**;
   below 5, say so plainly in the final summary as a real conversion risk (buyers
   expect a full gallery, not a floor-only listing). Recommended order: hero/
-  product-alone shot first (the thumbnail), lifestyle/context shots second, detail/
-  scale shots next, the size chart (apparel — itself mandatory, see below) ideally
-  ranked 2nd-3rd rather than last, and a personalization example last for
-  personalized items. This is a quality flag, not a `create_draft_listing` blocker —
-  don't hold up a listing over image count the way a missing image entirely blocks
-  it.
+  product-alone shot first (the thumbnail), **the size chart is always image
+  rank 2 — immediately after the featured/hero shot — whenever a size chart
+  exists for the product** (explicit user instruction, 2026-07-29; supersedes
+  the earlier "ranked 2nd-3rd" guidance below it used to say). This applies to
+  every product that has a size chart image available, not just clothing —
+  don't bury it further down the gallery or leave it near the end. Lifestyle/
+  context shots come after the size chart, then detail/scale shots, and a
+  personalization example last for personalized items. This is a quality flag,
+  not a `create_draft_listing` blocker — don't hold up a listing over image
+  count the way a missing image entirely blocks it.
 
 **Required additionally for physical listings (`type: physical` or `both`):**
 - `shipping_profile_id` — a real profile id from `get_shop_shipping_profiles` (or a
@@ -59,6 +63,9 @@ can add it later" is not an exception; get it now or don't create the listing ye
   `create_draft_listing` — or, for `etsy-copy-listing`, finish its image step —
   without one. If a size chart already exists among the product's own source images,
   that satisfies the requirement.
+- **The standard "DELIVERY TIME FRAME" footer (see the dedicated section below) must be
+  appended to the end of the description** — explicit user instruction, 2026-07-30,
+  applies to every physical listing on every connected account, not just one shop.
 
 **Required additionally for digital listings (`type: download` or `both`):**
 - At least **1 file attached** via `upload_listing_file` — the actual buyer download.
@@ -150,6 +157,41 @@ all 15 variants added") is expected too, not just silence implying success.
 ## Description — confirmed field rules
 - **No hard character limit surfaced by the API schema** (practically Etsy allows roughly 10,000 characters), but the **first ~160 characters are what actually show as the meta-description-style snippet** in Etsy search results and Google — write those like an ad headline, not a scene-setting intro.
 - Ideal working length for conversion: **150-400 words** (roughly under ~2,000 characters) — buyers skim, they don't read a novel; a tight scannable 200-word description usually outperforms a rambling 600-word one. Structure over length: open strong, then cover what it is / size or format / materials or delivery / how to use, in short scannable chunks (not a wall of prose).
+
+## Standard footer — DELIVERY TIME FRAME block (mandatory on every physical listing)
+
+**Explicit user instruction, 2026-07-30, applies to every connected account (not just
+one shop).** Every physical listing's description — every new one created going
+forward, and every existing one already on Etsy — must end with this exact block
+(verbatim, don't paraphrase it):
+
+```
+DELIVERY TIME FRAME:
+-------------------------------
+- Our estimated delivery time (processing time included) is around 8-10 business days within US, and 2-3 weeks for International shipping. If you have the exact date that you need the items, please let us know.
+- For international orders: We will ship from our other warehouses in the EU and Vietnam, depending on the customer's address, to optimize shipping time and cost.
+- Wanna add a personal touch for your item? Feel free to contact us, we will be happy to create the one just for you.
+***Please note that your order is made uniquely for you, as each item is produced individually after purchase, so we do not accept returns or exchanges.
+Please double-check your order before placing it, or feel free to message us if you need help reviewing your selections.
+We also cannot offer support or replacements for items that have been used or washed.
+Thank you for your understanding!
+```
+
+- **Physical listings only.** Digital/download listings don't ship, so this footer
+  doesn't apply to them — confirmed with the user 2026-07-30 when bulk-adding this to
+  itrat_etsy's catalog (39 physical listings got it; 8 digital SVG/clipart listings
+  were explicitly excluded).
+- **Applies to every skill that creates or rewrites a physical listing's description**
+  (`etsy-create-listing`, `etsy-new-listing-copywriter`, `etsy-copy-listing`,
+  `etsy-optimize-listing`) — append this block after the rest of the description is
+  finalized, not before (it's a fixed footer, not part of the Copy QA Gate's drafted
+  copy — don't run QA rewrites on this block itself, it's pasted verbatim every time).
+- **Every account, not just one shop** — this is a shop-wide policy applied uniformly,
+  not something scoped to whichever account happened to request it first.
+- Counts toward the description's overall length (see the 150-400 word ideal above for
+  the *rest* of the description) — the footer itself is fixed overhead, roughly 130
+  words, so keep the product-specific portion tight enough that the combined
+  description doesn't balloon past what buyers will actually read.
 
 ## "Meta title" clarification
 Etsy has **no separate meta-title field** distinct from the listing title — the `title` field itself is what renders as the page title / browser tab / Google search result headline. When a user asks for a "meta title," that request is answered by the title field above, not a second field.

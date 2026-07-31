@@ -1,3 +1,8 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Etsy Pricing Calculator</title>
 <style>
   :root {
@@ -254,7 +259,7 @@
   .instruction-head button.copied { color: var(--good); border-color: var(--good); }
   #instructionOut {
     width: 100%;
-    min-height: 76px;
+    min-height: 300px;
     resize: vertical;
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -310,6 +315,8 @@
   }
   .add-row-btn:hover { border-color: var(--accent); }
 </style>
+</head>
+<body>
 
 <div class="wrap">
   <h1>Etsy Pricing Calculator</h1>
@@ -383,13 +390,13 @@
         <label for="round99" style="margin:0">Round listing price up to nearest .99</label>
       </div>
 
-      <details id="feeDetails">
+      <details id="feeDetails" open>
         <summary onclick="setTimeout(calc,0)">Advanced: include Etsy fees</summary>
         <div class="checkbox-line">
-          <input type="checkbox" id="includeFees" onchange="toggleFees()">
+          <input type="checkbox" id="includeFees" checked onchange="toggleFees()">
           <label for="includeFees" style="margin:0">Account for Etsy fees eating into the discounted price</label>
         </div>
-        <div id="feeInputs" style="display:none">
+        <div id="feeInputs" style="display:block">
           <div class="fee-grid">
             <div>
               <label for="txnFee">Transaction fee</label>
@@ -458,7 +465,7 @@
               <input type="number" id="regulatoryPct" class="has-suffix" value="0" min="0" step="0.1" oninput="calc()">
               <span class="suffix">%</span>
             </div>
-            <p class="note">Etsy charges this only to shops based in specific countries (e.g. UK, France, Italy, Spain, Turkey) — check Shop Manager → Finances → Fees for your exact current rate, then enter it here.</p>
+            <p class="note">Etsy charges this only to shops based in specific countries (currently includes the UK, France, Italy, Spain, Turkey, Hungary, Vietnam, Canada, and India — the list and rates change periodically) — check Shop Manager → Finances → Fees for your shop's exact current rate, then enter it here.</p>
           </div>
 
           <p class="note">Transaction/processing defaults are Etsy's standard US rates — edit if your shop's rates differ.</p>
@@ -678,10 +685,27 @@ function calc() {
     warnBox.innerHTML = '<div class="warn">Combined fee rate is extremely high — double check the fee inputs above.</div>';
   }
 
-  const instruction = `Set this listing's price to ${fmt(listMin)}.\nThat's the "Listing price on Etsy" value above — no other fields need to change.`;
+  const variantResults = computeVariantResults(settings);
+
+  let instruction = `Set this listing's price to ${fmt(listMin)}.\nThat's the "Listing price on Etsy" value above — no other fields need to change.`;
+  if (variantResults.length > 0) {
+    const lines = variantResults.map(v => `- ${v.row.name || 'Variant'}: ${fmt(v.listPrice)}`).join('\n');
+    instruction += `\n\nThis listing has variants — set each variant's price individually via the inventory update, not the single price above:\n${lines}`;
+  }
   document.getElementById('instructionOut').value = instruction;
 
-  renderVariantTable(settings);
+  renderVariantTable(variantResults);
+}
+
+function computeVariantResults(settings) {
+  return variantRows.map(row => {
+    const cost = row.productCost + row.shippingCost;
+    const profit = desiredProfitForCost(cost, settings);
+    let listPrice = requiredListPrice(profit, cost, settings);
+    listPrice = roundPrice(listPrice, settings.round99);
+    const result = actualsAtListPrice(listPrice, cost, settings);
+    return { row, cost, listPrice, salePrice: result.salePrice, profit: result.profit, margin: result.margin };
+  });
 }
 
 function copyInstruction() {
@@ -716,16 +740,10 @@ function updateVariantField(id, field, value) {
   calc();
 }
 
-function renderVariantTable(settings) {
+function renderVariantTable(variantResults) {
   const body = document.getElementById('vtableBody');
   body.innerHTML = '';
-  variantRows.forEach(row => {
-    const cost = row.productCost + row.shippingCost;
-    const profit = desiredProfitForCost(cost, settings);
-    let listPrice = requiredListPrice(profit, cost, settings);
-    listPrice = roundPrice(listPrice, settings.round99);
-    const result = actualsAtListPrice(listPrice, cost, settings);
-
+  variantResults.forEach(({ row, cost, listPrice, salePrice, profit, margin }) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><input type="text" value="${escapeAttr(row.name)}" oninput="updateVariantField(${row.id}, 'name', this.value)"></td>
@@ -733,14 +751,14 @@ function renderVariantTable(settings) {
       <td><div class="field"><span class="prefix">$</span><input type="number" class="has-prefix" min="0" step="0.01" value="${row.shippingCost}" oninput="updateVariantField(${row.id}, 'shippingCost', this.value)"></div></td>
       <td class="vout">${fmt(cost)}</td>
       <td class="vout price">${fmt(listPrice)}</td>
-      <td class="vout">${fmt(result.salePrice)}</td>
-      <td class="vout ${result.profit < 0 ? 'warn-cell' : ''}">${fmt(result.profit)}</td>
-      <td class="vout ${result.margin < 0 ? 'warn-cell' : ''}">${result.margin.toFixed(1)}%</td>
+      <td class="vout">${fmt(salePrice)}</td>
+      <td class="vout ${profit < 0 ? 'warn-cell' : ''}">${fmt(profit)}</td>
+      <td class="vout ${margin < 0 ? 'warn-cell' : ''}">${margin.toFixed(1)}%</td>
       <td><button type="button" class="vrow-remove" onclick="removeVariantRow(${row.id})" title="Remove variant">✕</button></td>
     `;
     body.appendChild(tr);
   });
-  document.getElementById('variantNote').textContent = variantRows.length === 0 ? 'Add a row to compare variants.' : '';
+  document.getElementById('variantNote').textContent = variantResults.length === 0 ? 'Add a row to compare variants.' : '';
 }
 
 function escapeAttr(s) {
@@ -749,3 +767,5 @@ function escapeAttr(s) {
 
 calc();
 </script>
+</body>
+</html>

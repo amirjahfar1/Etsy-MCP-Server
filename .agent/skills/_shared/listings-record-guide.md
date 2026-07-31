@@ -30,22 +30,60 @@ If a listing was built from a product template, cross-reference it
 (`product_template_ref`) rather than duplicating the whole recipe — this file
 is the *instance* record, not a second copy of the reusable data.
 
-## File location — one folder per connected account
+## File location — one folder per listing, nested under one folder per connected account
 
-`../../../etsy-mcp-server/data/listings/<account>/<listing_id>.json`,
-relative to any skill's own folder — same resolution pattern as the other
-shared data stores. `<account>` is the exact connected-account name from
-`accounts.json`/`list_accounts` (e.g. `abbas_etsy`) — **every account gets
-its own subfolder**, so a shop with 3 connected accounts ends up with 3
-subfolders under `data/listings/`, never one flat mixed folder. This mirrors
-how `accounts.json` already separates shops, and keeps a shop's listings
-scannable without cross-account noise.
+**Updated 2026-07-31 (explicit user instruction): this store is now
+folder-based, not a flat file per listing.** Every physical listing gets its
+own folder so its record and its actual media (images/video) live together
+as one self-contained, portable unit, decoupled from wherever the source
+image files were originally staged (`Add Product/AliExpress/`,
+`Add Product/Merchize/`, `Add Product/Custom/`, or any other path given at
+upload time):
+
+```
+../../../data/listings/<account>/<listing_id>/
+  record.json      (this file's schema, unchanged in shape — see below)
+  images/
+    01.jpg
+    02.jpg
+    ...
+  video/
+    video.mp4       (only present if the listing has one)
+```
+
+`<account>` is the exact connected-account name from `accounts.json`/
+`list_accounts` (e.g. `itrat_etsy`) — every account still gets its own
+subfolder, so a shop with 3 connected accounts ends up with 3 subfolders
+under `data/listings/`, never one flat mixed folder.
+
+**Why this exists:** the old flat-file schema recorded an image's Etsy-side
+`listing_image_id` but never the local file it was uploaded from — so if a
+listing's account ever went offline/suspended, Etsy's own hosted copies
+become unreachable too, and there was no way to recover the actual photo
+without manually re-matching listings to whatever staging folder they might
+still sit in. Copying the file into the listing's own `images/`/`video/`
+folder at upload time, and pointing `source_path` at that copy (not the
+original), means the listing survives regardless of what happens to the
+original staging folder or the Etsy account itself.
+
+**The sync rule this replaces:** any time `upload_listing_image`/
+`upload_listing_video` succeeds, download or copy that exact file into this
+folder (not just record its Etsy CDN URL) — the copy is the durable one,
+never a live URL. Naming convention: images as `01.jpg`, `02.jpg`, ... in
+rank order; video as `video.mp4`.
+
+**Digital listings stay on the old flat-file convention**
+(`data/listings/<account>/<listing_id>.json`, no folder). Etsy's API has no
+way to fetch a digital listing's actual buyer-download file content
+(`get_all_listing_files`/`get_listing_file` return only filename/size, never
+a download URL) — so there is nothing to put in an `images`-style local
+media folder for the deliverable itself. Don't invent a `files/` folder or a
+download URL for these; a missing local copy of the deliverable is an Etsy
+API limitation, not a bug in this store.
 
 Gitignored, like `accounts.json`/`tags-database.json`/`data/products/`.
-Filename is the numeric `listing_id` — always known immediately after
-`create_draft_listing` succeeds.
 
-## Schema
+## Schema (`record.json`, or the flat `<listing_id>.json` for digital listings)
 
 ```json
 {
@@ -79,9 +117,9 @@ Filename is the numeric `listing_id` — always known immediately after
     {"sku": "...", "values": {"<axis name>": "<value>"}, "price": 0, "quantity": 0}
   ],
   "images": [
-    {"listing_image_id": 0, "rank": 1, "alt_text": "..."}
+    {"listing_image_id": 0, "rank": 1, "alt_text": "...", "source_path": "data/listings/<account>/<listing_id>/images/01.jpg"}
   ],
-  "video": null,
+  "video": {"video_id": 0, "source_path": "data/listings/<account>/<listing_id>/video/video.mp4"},
   "research": {
     "avg_price": 0,
     "landed_price_band": "<e.g. \"$18-24\">",
@@ -114,16 +152,23 @@ whatever point it stopped:
 
 1. **Right after `create_draft_listing` succeeds** (Step 4 of
    `etsy-create-listing`, or the equivalent point in
-   `etsy-new-listing-copywriter`'s own draft-creation path): create the file
-   at `data/listings/<account>/<listing_id>.json` with `listing_data` filled
-   in, `variants: null`, `images: []`. If Phase 1 research ran for this
-   listing, also fill in `research` from its price findings
+   `etsy-new-listing-copywriter`'s own draft-creation path): for a physical
+   listing, create the folder `data/listings/<account>/<listing_id>/` and
+   write `record.json` inside it with `listing_data` filled in,
+   `variants: null`, `images: []`; for a digital listing, create the flat
+   file `data/listings/<account>/<listing_id>.json` instead (see the
+   digital-listings note above). If Phase 1 research ran for this listing,
+   also fill in `research` from its price findings
    (`avg_price`/`landed_price_band`/`suggested_price`, `researched_at` =
    today); otherwise omit the field.
 2. **After `update_listing_inventory` succeeds** (Step 5, if the listing has
    variants): update `variants` with the full combination list.
-3. **After each `upload_listing_image` succeeds** (Step 6): append that
-   image's `{listing_image_id, rank, alt_text}` to `images`.
+3. **After each `upload_listing_image` succeeds** (Step 6): copy/download
+   the exact uploaded file into that listing's `images/` folder (named by
+   rank, e.g. `03.jpg`), then append `{listing_image_id, rank, alt_text,
+   source_path}` to `images` in `record.json` — the `source_path` must point
+   at that copy, not the original upload path. Same pattern for
+   `upload_listing_video` into `video/video.mp4`.
 4. **After `state` changes** (e.g. publishing to `active` via
    `update_listing`): update `state`.
 
@@ -132,10 +177,11 @@ whatever point it stopped:
 This is the part that makes the store worth trusting: **any time
 `update_listing`, `update_listing_inventory`, `upload_listing_image`,
 `delete_listing_image`, or `upload_listing_video` succeeds against a
-`listing_id` — check whether a record exists at
-`data/listings/<account>/<listing_id>.json` (it will, for anything this
-system created) and update the changed fields in place.** This applies
-regardless of which skill made the call:
+`listing_id` — check whether a record exists (`data/listings/<account>/
+<listing_id>/record.json` for physical, `data/listings/<account>/
+<listing_id>.json` for digital — it will, for anything this system created)
+and update the changed fields in place.** This applies regardless of which
+skill made the call:
 
 - `etsy-optimize-listing` rewrites title/tags/description/price → update
   `listing_data.title`/`tags`/`description`/`price` in that listing's record.
