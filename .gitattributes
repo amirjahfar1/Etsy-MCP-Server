@@ -1,6 +1,7 @@
 # Normalise line endings (the project moves between Windows and macOS).
 * text=auto eol=lf
 *.bat text eol=crlf
+*.cmd text eol=crlf
 *.png binary
 *.jpg binary
 *.jpeg binary

@@ -35,8 +35,8 @@ Default: every **active** account (`list_accounts`). Deactivated accounts are sk
 ### 1. Deterministic first pass (free, instant, local)
 Run from the project root:
 ```
-python3 scripts/risk-prefilter.py --staging            # all active accounts + staging folders
-python3 scripts/risk-prefilter.py --account Anas       # one account (also works for a deactivated one)
+node scripts/risk-prefilter.mjs --staging            # all active accounts + staging folders
+node scripts/risk-prefilter.mjs --account Anas       # one account (also works for a deactivated one)
 ```
 It matches `scripts/risk-terms.txt` (franchises, fashion/consumer brands, leagues, celebrities — extend that file whenever a new
 case is found) against local listing records and staging folder/file names/`product-details.txt`, and flags: brand terms, buyer-visible

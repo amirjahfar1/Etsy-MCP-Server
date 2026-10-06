@@ -28,3 +28,6 @@ etsy-mcp-server/build/
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Backups written by scripts/setup.mjs
+*.bak

@@ -28,8 +28,8 @@ frozen/rolled-back listing is the cause (see Judge step).
 
 ### Layer 1 — Local integrity (free, instant, no API)
 ```
-python3 scripts/local-integrity.py            # grouped summary
-python3 scripts/local-integrity.py --verbose  # every listing
+node scripts/local-integrity.mjs            # grouped summary
+node scripts/local-integrity.mjs --verbose  # every listing
 ```
 Checks every record against the registry and `accounts.json`: `product_id` present and matching, **`sources` non-empty** (hard rule),
 registry ↔ record orphans, unknown account folders, bad JSON, id/account mismatches, tag rules (13 tags, ≤20 chars, lowercase, no
@@ -47,9 +47,9 @@ reported as a separate "legacy debt" line, not mixed into current problems.
    num_favorers, url`. It must validate the file parses and reply with only a count — never paste listings into chat.
 3. Compare (deterministic):
 ```
-python3 scripts/sync-diff.py <account> <scratchpad>/<account>-live.json            # report only
-python3 scripts/sync-diff.py <account> <live.json> --snapshot                      # also append views/favorites snapshot
-python3 scripts/sync-diff.py <account> <live.json> --apply                         # write live values into local records
+node scripts/sync-diff.mjs <account> <scratchpad>/<account>-live.json            # report only
+node scripts/sync-diff.mjs <account> <live.json> --snapshot                      # also append views/favorites snapshot
+node scripts/sync-diff.mjs <account> <live.json> --apply                         # write live values into local records
 ```
 Finding kinds: **live-only** (on Etsy, no record — create one from live state per the listings-record rule, don't just flag it),
 **record-only** (record but Etsy didn't return it — deleted, or in a state not fetched), **drift** (field-level local vs live).
