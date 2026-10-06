@@ -59,6 +59,15 @@ below are verified against the live Etsy API schema (`etsy-docs` MCP,
 uncertain at payload-build time, confirm via `etsy-docs` (`get_endpoint`,
 `search_etsy_api`), never guess.
 
+## Mandatory gates (single checklist — do not restate rules here)
+
+Run every gate in `../_shared/listing-gates.md` that applies to this flow, in order A → B → C → D → E: shop-DNA read,
+`sources` hard-block, trademark screen, photo verification, jewelry style-match, **rank-first title**
+(`../_shared/rank-first-title-guide.md`), Copy QA Gate, **DELIVERY TIME FRAME** block, table-confirmed write,
+listings-record / tags-bank / registry bookkeeping, final verification. The steps below add flow-specific detail only;
+they never override a gate. If this file ever disagrees with that checklist or CLAUDE.md, the checklist wins — report the
+contradiction to the user instead of choosing silently.
+
 ## Workflow
 
 **Batching note:** Steps 0a, 1, 1b, and 1c below are four separate
@@ -81,6 +90,20 @@ research, taxonomy lookup) targeted instead of guesswork. If the user already
 stated it plainly in their request, just restate it back in passing to
 confirm rather than asking cold; only pause and ask outright when it's
 genuinely unclear what the product is.
+
+**Brand/trademark screen — mandatory, same moment as the name check (standing
+rule, 2026-08-06, explicit user instruction, see root `CLAUDE.md`).** The
+instant the product's core name is known, check it (plus whatever source
+URL/description came with it) for a franchise/show/game title, licensed
+character name, sports team/league name, celebrity name, or third-party
+brand/logo name — not a generic style word like "gothic" or "streetwear", a
+literal branded/licensed name. If one is present, **stop here, before any
+research or template lookup starts** — don't spend Step 0b-2's work on a
+product that can't be listed. Tell the user plainly which term triggered it
+and why: two abbas_etsy listings using "Avatar: The Last Airbender" in the
+title (4542392204, 4542411318) got frozen by Etsy for exactly this, and
+can't be un-frozen via the API. Full checklist and reasoning:
+`../_shared/etsy-seo-standards.md`'s Copy QA Gate, item 10.
 
 ### Step 0b — Check for a reusable product template
 
@@ -533,11 +556,12 @@ reusing them, since markup strategy can change between runs.
   when one exists.
 - Ask for the **absolute local path(s)** of the image file(s) to attach, and
   the order they should appear in (rank 1 = first/leftmost, the thumbnail).
-  `alt_text` defaults automatically to one of the listing's own tags per
-  image (in tag order, one tag per image — not all 13 joined together),
-  per the standing rule in `../_shared/etsy-seo-standards.md`
-  — don't ask about it; only depart from the default if the user
-  proactively asks for custom alt text on a specific image.
+  `alt_text` is derived automatically, not asked about (hard rule, 2026-08-19,
+  see `../_shared/etsy-seo-standards.md` "Image alt text"): rename each gallery
+  image locally to a keyword-rich hyphenated name first, then set `alt_text` to
+  that filename with the extension stripped and hyphens turned into spaces; the
+  featured image uses the product's core name; a size chart uses `size chart`.
+  Always send `alt_text` and `rank` together on in-place updates.
 - Ask whether they have a listing video (Etsy allows one) and its local path.
 - **Hard block, no exceptions: do not call `create_draft_listing` until at
   least one real image path has been collected.** Per the Listing
@@ -734,12 +758,13 @@ when the exact value already exists there.
 
 Skip this step entirely for digital listings and no-variant physical ones.
 
-### Step 6 — Upload images and video (one confirmed write each)
+### Step 6 — Upload images and video (Claude does this; covered by the Step-4 table)
 
-For each image, in the user's chosen order: show what will be sent
-(`listing_id`, `image_path`, `rank`, `alt_text` if any), get an individual
-confirmation, then call `upload_listing_image`. **One confirmation per
-image — never batch several uploads behind one "yes".** Optional flags
+Per CLAUDE.md "images and video are uploaded by Claude as part of listing creation" (2026-10-07): the media list (rank order,
+renamed filename, `alt_text`, video, size chart) was already part of the table the user approved in Step 4, so **upload every
+image and the video now without asking per file**: for each image in order call `upload_listing_image` (`listing_id`, `image_path`,
+`rank`, `alt_text` together), then `upload_listing_video`. Find the files yourself in the product's staging folder
+(`Add Product/…`) — don't ask the user to upload anything. An unreadable/missing file is reported and skipped; the rest continue. Optional flags
 `overwrite`/`is_watermarked` only if the user asks for them. **After each
 successful upload, append it to the listings-record file's `images`** per
 `../_shared/listings-record-guide.md`.
@@ -787,8 +812,7 @@ calls in sequence** — treat each as its own gate:
 - `create_shop_shipping_profile` — its own confirmation, if needed (Step 3).
 - `create_processing_profile` — its own confirmation, if needed (Step 3).
 - `update_listing_inventory` — its own confirmation (Step 5).
-- `upload_listing_image` — **one confirmation per image** (Step 6).
-- `upload_listing_video` — its own confirmation (Step 6).
+- `upload_listing_image` / `upload_listing_video` — **no separate confirmation**: covered by the Step-4 create table (Step 6).
 - `upload_listing_file` — its own confirmation (Step 7).
 
 Never bundle multiple writes behind one "yes". A confirmation of the draft

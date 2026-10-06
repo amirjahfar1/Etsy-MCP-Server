@@ -113,6 +113,15 @@ This project manages a real, live-money shop. Per the project-wide rule, any
 
 ---
 
+## Mandatory gates (single checklist — do not restate rules here)
+
+Run every gate in `../_shared/listing-gates.md` that applies to this flow, in order A → B → C → D → E: shop-DNA read,
+`sources` hard-block, trademark screen, photo verification, jewelry style-match, **rank-first title**
+(`../_shared/rank-first-title-guide.md`), Copy QA Gate, **DELIVERY TIME FRAME** block, table-confirmed write,
+listings-record / tags-bank / registry bookkeeping, final verification. The steps below add flow-specific detail only;
+they never override a gate. If this file ever disagrees with that checklist or CLAUDE.md, the checklist wins — report the
+contradiction to the user instead of choosing silently.
+
 ## Phase 1 — RESEARCH
 
 ### Step 0 — Get the product brief (ask, don't assume)
@@ -356,6 +365,11 @@ Everything here is drafted against Phase 1's findings, with the field rules
 enforced *at the point of writing*, not remembered from the top of the file.
 
 ### Title
+
+**Rank-first (mandatory, 2026-10-07):** before writing any title, run the procedure in
+`../_shared/rank-first-title-guide.md` — top-20 ranking listings for the buyer's search term, lead-phrase pattern
+shown as a table — and build characters 1-40 from that pattern. The structure notes below only govern the
+remaining characters and the hard field limits.
 
 Constraints (hard, from the API — see `../_shared/etsy-seo-standards.md`):
 **max 140 characters**; letters, numbers, punctuation, math symbols,

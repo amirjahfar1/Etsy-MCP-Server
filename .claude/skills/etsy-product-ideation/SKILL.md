@@ -24,6 +24,8 @@ This skill's research steps are all read-only, and **this skill itself never cal
 
 Once the user is in `etsy-new-listing-copywriter`'s flow, that skill's own confirm-before-write discipline applies: nothing is created without an explicit "yes / haan / confirm" against the exact payload, one concept at a time.
 
+**Brand/trademark screen — mandatory, before any concept is presented (standing rule, 2026-08-06, explicit user instruction, see root `CLAUDE.md`).** None of the 5 concepts may center on a franchise/show/game title, licensed character, sports team/league, celebrity name, or third-party brand/logo — even if trend data or a competitor listing surfaces one as "what's working." A generic style/aesthetic word ("gothic", "cottagecore") is fine to lean into; a literal branded/licensed name is not. If Step 1/2's research turns up a trending or competitor concept built around a branded name, either drop it or reframe it around the underlying *style* rather than the branded name itself, and say so in the rationale. Reason: two abbas_etsy listings built around "Avatar: The Last Airbender" got frozen by Etsy and can't be un-frozen via the API — this screen exists so a branded concept never even reaches `etsy-new-listing-copywriter`'s hand-off. Full checklist: `../_shared/etsy-seo-standards.md`'s Copy QA Gate, item 10.
+
 Also flag, whenever a concept is presented: photos still need to be added before a new listing can be published (`upload_listing_image`/`upload_listing_video` exist for that, once files are ready and confirmed — but this skill doesn't judge photo quality or generate images). Set that expectation up front so nobody thinks a concept is a finished listing.
 
 ## Workflow — the three inputs

@@ -132,6 +132,15 @@ user's own explicit stated plan for this workflow, so it's a disclosure,
 not a blocking question, but it must appear every time, not just be assumed
 understood after the first run.
 
+## Mandatory gates (single checklist — do not restate rules here)
+
+Run every gate in `../_shared/listing-gates.md` that applies to this flow, in order A → B → C → D → E: shop-DNA read,
+`sources` hard-block, trademark screen, photo verification, jewelry style-match, **rank-first title**
+(`../_shared/rank-first-title-guide.md`), Copy QA Gate, **DELIVERY TIME FRAME** block, table-confirmed write,
+listings-record / tags-bank / registry bookkeeping, final verification. The steps below add flow-specific detail only;
+they never override a gate. If this file ever disagrees with that checklist or CLAUDE.md, the checklist wins — report the
+contradiction to the user instead of choosing silently.
+
 ## Workflow
 
 ### Step 0 — Resolve the source listing and target account
@@ -172,6 +181,22 @@ does) rather than pretending to clone the source's exact costs.
 `processing_min`/`processing_max` from the source listing itself, however,
 *is* public and can be matched against the target account's processing
 profiles directly.
+
+**Brand/trademark screen — mandatory, right after Step 1's read, before any
+research starts (standing rule, 2026-08-06, explicit user instruction, see
+root `CLAUDE.md`).** A "winning listing" worth cloning may itself be a
+branded/licensed reseller listing — check the source's title, tags, and
+description for a franchise/show/game title, licensed character name, sports
+team/league name, celebrity name, or third-party brand/logo name (a generic
+style word like "gothic" is fine; a literal franchise/character/brand name is
+not). If one is present, **stop here** — don't run Step 2's research on a
+product that can't be relisted. Flag the exact term to the user: two
+abbas_etsy listings cloned with "Avatar: The Last Airbender" in the title
+(4542392204, 4542411318) got frozen by Etsy for exactly this and can't be
+un-frozen via the API. Full checklist: `../_shared/etsy-seo-standards.md`'s
+Copy QA Gate, item 10 — this same item also re-fires naturally in Step 2.4's
+QA pass on the *new* title/tags/description, but catching it here first
+avoids wasting a research pass on a source that was never listable.
 
 ### Step 2 — Tag-seeded research, BEFORE the draft exists
 
@@ -303,8 +328,9 @@ if Step 3 confirmed it):
    those are fresh on the new listing).
 4. Images — download **every** source image URL (all of them, 100% as-is,
    no subset) to a local temp file, then `upload_listing_image` one at a
-   time in the same order, each its own confirmation (same "one
-   confirmation per image" rule as `etsy-create-listing`). The separate
+   time in the same order, **with no per-image confirmation** — the image
+   list is part of the create table the user approved (CLAUDE.md "images
+   and video are uploaded by Claude as part of listing creation"). The separate
    image-copyright disclosure above (about the photos being the source
    listing's own, not this shop's) still applies.
    **If the product is clothing/apparel**, confirm a size-chart image is

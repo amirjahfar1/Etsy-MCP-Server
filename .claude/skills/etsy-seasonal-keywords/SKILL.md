@@ -37,6 +37,15 @@ Set an explicit **revert date** for shortly after the holiday (typically within 
 week after), so the seasonal terms don't linger and dilute evergreen SEO for the
 other ~11 months.
 
+## Mandatory gates (single checklist — do not restate rules here)
+
+Run every gate in `../_shared/listing-gates.md` that applies to this flow, in order A → B → C → D → E: shop-DNA read,
+`sources` hard-block, trademark screen, photo verification, jewelry style-match, **rank-first title**
+(`../_shared/rank-first-title-guide.md`), Copy QA Gate, **DELIVERY TIME FRAME** block, table-confirmed write,
+listings-record / tags-bank / registry bookkeeping, final verification. The steps below add flow-specific detail only;
+they never override a gate. If this file ever disagrees with that checklist or CLAUDE.md, the checklist wins — report the
+contradiction to the user instead of choosing silently.
+
 ## Workflow
 
 ### 1. Check the shop's holiday configuration

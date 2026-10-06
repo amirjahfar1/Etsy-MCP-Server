@@ -32,6 +32,15 @@ Optimizing in a vacuum produces generic listings. The winning move is to triangu
 
 Diffing the target against both, rather than against best-practice theory alone, is what makes the rewrite competitive instead of merely tidy.
 
+## Mandatory gates (single checklist — do not restate rules here)
+
+Run every gate in `../_shared/listing-gates.md` that applies to this flow, in order A → B → C → D → E: shop-DNA read,
+`sources` hard-block, trademark screen, photo verification, jewelry style-match, **rank-first title**
+(`../_shared/rank-first-title-guide.md`), Copy QA Gate, **DELIVERY TIME FRAME** block, table-confirmed write,
+listings-record / tags-bank / registry bookkeeping, final verification. The steps below add flow-specific detail only;
+they never override a gate. If this file ever disagrees with that checklist or CLAUDE.md, the checklist wins — report the
+contradiction to the user instead of choosing silently.
+
 ## Workflow
 
 1. **Identify the core keyword(s).** Call `get_listing_details` on the target listing. Extract its primary keyword(s) from the current title and tags — the phrases a buyer would actually type. Treat this as a starting suggestion to confirm in step 2, not a final answer.

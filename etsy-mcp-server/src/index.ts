@@ -74,6 +74,11 @@ interface Account {
   // Falls back to the global API_KEY/SHARED_SECRET when absent.
   api_key?: string;
   shared_secret?: string;
+  // "active" when absent (backward-compatible with accounts connected
+  // before this field existed). "deactivated" accounts are blocked from
+  // every tool call (see getAccount) until reactivated via
+  // set_account_status.
+  status?: "active" | "deactivated";
 }
 
 interface AccountsFile {
@@ -125,6 +130,11 @@ function getAccount(name: string): Account {
     const known = Object.keys(accountsData.accounts).join(", ") || "(none connected yet)";
     throw new Error(`Unknown account "${name}". Known accounts: ${known}`);
   }
+  if (account.status === "deactivated") {
+    throw new Error(
+      `Account "${name}" is deactivated. Reactivate it with set_account_status (status: "active") before using it, or pass a different account.`
+    );
+  }
   return account;
 }
 
@@ -144,10 +154,14 @@ function getPublicClient(accountName?: string): AxiosInstance {
     if (!accountName) return etsyClient;
   }
 
+  // Validate (unknown/deactivated) before ever trusting a cached client —
+  // a client cached while the account was active must not keep working
+  // after it's deactivated.
+  const account = getAccount(accountName);
+
   const cached = publicClients.get(accountName);
   if (cached) return cached;
 
-  const account = getAccount(accountName);
   const apiKey = account.api_key || API_KEY;
   const sharedSecret = account.shared_secret || SHARED_SECRET;
 
@@ -187,10 +201,14 @@ async function refreshAccessToken(accountName: string) {
 const oauthClients = new Map<string, AxiosInstance>();
 
 function getOauthClient(accountName: string): AxiosInstance {
+  // Validate (unknown/deactivated) before ever trusting a cached client —
+  // a client cached while the account was active must not keep working
+  // after it's deactivated.
+  const account = getAccount(accountName);
+
   const cached = oauthClients.get(accountName);
   if (cached) return cached;
 
-  const account = getAccount(accountName);
   const apiKey = account.api_key || API_KEY;
   const sharedSecret = account.shared_secret || SHARED_SECRET;
 
@@ -455,13 +473,13 @@ const TOOLS: Tool[] = [
   {
     name: "list_accounts",
     description:
-      "List all connected Etsy accounts (name, shop_id, shop_name) and which one is currently the default for tools that don't specify an `account`.",
+      "List all connected Etsy accounts (name, shop_id, shop_name, status: active/deactivated) and which one is currently the default for tools that don't specify an `account`.",
     inputSchema: { type: "object", properties: {} },
   },
   {
     name: "set_default_account",
     description:
-      "Change which connected account is used by default when a tool call omits `account`.",
+      "Change which connected account is used by default when a tool call omits `account`. Fails if the target account is deactivated.",
     inputSchema: {
       type: "object",
       properties: {
@@ -471,6 +489,26 @@ const TOOLS: Tool[] = [
         },
       },
       required: ["account"],
+    },
+  },
+  {
+    name: "set_account_status",
+    description:
+      "Mark a connected account as active or deactivated. A deactivated account is fully blocked from use — every tool call against it (including public/read-only calls, and being the default account) errors until it's set back to active. Deactivating the current default account clears default_account (a new one must be set explicitly).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        account: {
+          type: "string",
+          description: "Account name (see list_accounts).",
+        },
+        status: {
+          type: "string",
+          enum: ["active", "deactivated"],
+          description: "New status for the account.",
+        },
+      },
+      required: ["account", "status"],
     },
   },
 ];
@@ -780,16 +818,42 @@ async function listAccounts() {
       name,
       shop_id: acc.shop_id,
       shop_name: acc.shop_name,
+      status: acc.status || "active",
       is_default: name === accountsData.default_account,
     })),
   };
 }
 
 function setDefaultAccount(args: any) {
-  getAccount(args.account); // throws if unknown; also reloads accountsData fresh
+  getAccount(args.account); // throws if unknown or deactivated; also reloads accountsData fresh
   accountsData.default_account = args.account;
   saveAccounts(accountsData);
   return { default_account: accountsData.default_account };
+}
+
+function setAccountStatus(args: any) {
+  reloadAccounts();
+  const account = accountsData.accounts[args.account];
+  if (!account) {
+    const known = Object.keys(accountsData.accounts).join(", ") || "(none connected yet)";
+    throw new Error(`Unknown account "${args.account}". Known accounts: ${known}`);
+  }
+  if (args.status !== "active" && args.status !== "deactivated") {
+    throw new Error('status must be "active" or "deactivated"');
+  }
+  account.status = args.status;
+  // Never leave default_account pointed at a now-deactivated account —
+  // clear it so resolveAccountName forces an explicit choice next time,
+  // rather than every default-account call silently starting to fail.
+  if (args.status === "deactivated" && accountsData.default_account === args.account) {
+    accountsData.default_account = "";
+  }
+  saveAccounts(accountsData);
+  return {
+    account: args.account,
+    status: account.status,
+    default_account: accountsData.default_account || null,
+  };
 }
 
 // Tool handlers
@@ -1244,6 +1308,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: "text", text: JSON.stringify(await listAccounts(), null, 2) }] };
       case "set_default_account":
         return { content: [{ type: "text", text: JSON.stringify(setDefaultAccount(args), null, 2) }] };
+      case "set_account_status":
+        return { content: [{ type: "text", text: JSON.stringify(setAccountStatus(args), null, 2) }] };
       case "upload_listing_image":
         return { content: [{ type: "text", text: JSON.stringify(await uploadListingImage(args), null, 2) }] };
       case "upload_listing_video":

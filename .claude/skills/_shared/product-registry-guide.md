@@ -52,6 +52,9 @@ stores. Gitignored, like the other data stores under `data/`.
         {"account": "<connected account name>", "listing_id": 0, "state": "draft | active | inactive | not_found_on_etsy"}
       ],
       "accounts_published": ["<every distinct account name in listings, for a quick membership check>"],
+      "sources": [
+        {"type": "link | text", "value": "<supplier URL or plain description>", "label": "<short supplier name, e.g. \"AliExpress\", omit if not obvious>", "added_date": "<ISO date>"}
+      ],
       "needs_resync": true,
       "note": "<flag uncertain matches, duplicates, or anything a human should double-check>"
     }
@@ -107,6 +110,15 @@ same turn as the confirmed Etsy write it followed, every time:
    record file (`data/listings/<account>/<listing_id>.json`).
 4. Bump `last_built` only on a full rebuild (see below); a single incremental
    add doesn't need it, though it's harmless to bump.
+
+## Sourcing (`sources`) — a product-level fact, shared across every account it reaches
+
+Unlike shipping/pricing/personalization (which are genuinely per-account/per-listing), **where the product itself is actually sourced from is a fact about the design, not the listing** — it doesn't change when the same product gets published to a second account. See CLAUDE.md's dedicated standing rule for the full policy (mandatory, propagation behavior, retrieval use case); this section just covers the mechanics:
+
+- Store the array under this entry's `sources` field (schema above). A product can have more than one legitimate source (e.g. sourced from AliExpress for one batch, Printify for another) — always an array, append new entries rather than replacing.
+- **Also mirror the identical array onto every listing record** (`data/listings/<account>/<listing_id>/record.json`) under this `product_id` — see `listings-record-guide.md`. The registry is the cross-account rollup; the listing record is what a single-listing lookup (e.g. resolving an order's `listing_id` to its source) actually reads first.
+- **When a source is given for one listing and this product already has `listings` entries on other accounts**, update the source in this one registry entry (which naturally covers every account, since it's one shared array) and then re-sync every sibling listing record's mirrored `sources` field to match — don't leave one account's copy stale after another account's was updated.
+- Dedupe on exact `value` match (case-sensitive for links, case-insensitive for text) before appending — the same source given twice shouldn't create two entries.
 
 ## Matching products across accounts — judgment, not string equality
 

@@ -2,6 +2,10 @@
 # Copy .mcp.json.example to .mcp.json and fill in your own values.
 .mcp.json
 
+# Google Sheets MCP — OAuth client + authorized token (reused from the SEO project).
+sheets-oauth.json
+sheets-token.json
+
 # Local runtime data store — tag research, saved product templates, listing
 # records, cross-account product registry. Shop-specific state, not shareable.
 data/
@@ -10,6 +14,7 @@ data/
 # raw photoshoot images. Business content, not shareable in a public repo.
 Add Product/
 Shoots/
+Size charts/
 
 # Dependencies
 etsy-mcp-server/node_modules/

@@ -94,6 +94,10 @@ Gitignored, like `accounts.json`/`tags-database.json`/`data/products/`.
   "state": "draft | active | inactive",
   "type": "physical | download | both",
   "product_template_ref": "<data/products/<Supplier> products/<slug>.json filename, or null if not template-sourced>",
+  "product_id": "<same product_id as this listing's data/product-registry.json entry>",
+  "sources": [
+    {"type": "link | text", "value": "<supplier URL or plain description>", "label": "<short supplier name, e.g. \"AliExpress\", omit if not obvious>", "added_date": "<ISO date>"}
+  ],
   "created_date": "<ISO date>",
   "last_updated": "<ISO date>",
   "listing_data": {
@@ -204,6 +208,14 @@ Etsy API call — it needs no separate user confirmation of its own (it's not a
 write to Etsy, it's local bookkeeping), but do mention briefly that the
 record was synced so the user knows it's happening (a short aside is enough,
 not a whole report section). Always bump `last_updated`.
+
+## Sourcing (`sources`) — mirrored from the product registry, never asked twice per account
+
+Every record's `sources` array is a **mirror of that same `product_id`'s `sources` entry in `data/product-registry.json`** — see the dedicated standing rule in CLAUDE.md and the mechanics in `product-registry-guide.md`. Mandatory on every listing, mandatory before/at creation (part of the Listing Completeness Gate in `etsy-seo-standards.md`), same footing as materials/taxonomy.
+
+- Write it here **and** in the registry at the same time — never update just one side.
+- If the user gives a source for a listing whose `product_id` already has other accounts/listings on file, that source applies to every one of them — re-sync this field on every sibling listing record too, not just the one the user named.
+- Never ask the user for a source again for a product that already has one on file just because it's being published to a *new* account — sourcing carries over automatically; only ask if the registry genuinely has no `sources` entry yet for that `product_id`.
 
 ## Manual resync from live Etsy state — a standing, on-demand capability
 

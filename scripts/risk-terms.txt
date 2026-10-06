@@ -1,0 +1,175 @@
+# One term per line. Matched case-insensitively on whole words/phrases. A hit is a REVIEW flag, not an automatic block:
+# many terms are also ordinary words ("jordan", "coach", "vans"). Claude judges context. Lines starting with # are ignored.
+# Sections are for humans only. Add terms freely; precision matters less than not missing a real franchise/brand.
+
+# --- franchises / shows / games / characters ---
+disney
+pixar
+mickey mouse
+minnie mouse
+frozen elsa
+elsa
+stitch
+winnie the pooh
+marvel
+avengers
+spider-man
+spiderman
+batman
+superman
+dc comics
+harry potter
+hogwarts
+gryffindor
+slytherin
+hufflepuff
+ravenclaw
+lord of the rings
+star wars
+mandalorian
+baby yoda
+grogu
+pokemon
+pikachu
+nintendo
+mario
+zelda
+minecraft
+fortnite
+roblox
+sanrio
+hello kitty
+kuromi
+my melody
+cinnamoroll
+naruto
+one piece
+dragon ball
+demon slayer
+jujutsu kaisen
+attack on titan
+studio ghibli
+totoro
+avatar the last airbender
+last airbender
+airbender
+stranger things
+game of thrones
+the office
+friends tv
+squid game
+barbie
+bluey
+paw patrol
+cocomelon
+spongebob
+peppa pig
+looney tunes
+simpsons
+south park
+rick and morty
+bridgerton
+wednesday addams
+twilight
+hunger games
+
+# --- fashion / consumer brands ---
+nike
+adidas
+puma
+reebok
+under armour
+new balance
+jordan
+yeezy
+supreme
+bape
+off-white
+sp5der
+spider worldwide
+gucci
+louis vuitton
+chanel
+prada
+dior
+burberry
+versace
+balenciaga
+fendi
+hermes
+tiffany
+cartier
+pandora
+swarovski
+rolex
+lululemon
+carhartt
+champion
+the north face
+patagonia
+levi's
+vans
+converse
+ralph lauren
+calvin klein
+tommy hilfiger
+hello fresh
+starbucks
+coca-cola
+pepsi
+red bull
+harley-davidson
+ferrari
+lamborghini
+porsche
+tesla
+yankees
+dodgers
+
+# --- sports leagues / teams / orgs ---
+nfl
+nba
+mlb
+nhl
+fifa
+ufc
+wwe
+olympics
+super bowl
+premier league
+real madrid
+barcelona fc
+manchester united
+liverpool fc
+
+# --- celebrities / music / people ---
+taylor swift
+eras tour
+beyonce
+rihanna
+drake
+travis scott
+kanye
+bad bunny
+billie eilish
+harry styles
+bts
+blackpink
+stray kids
+one direction
+metallica
+nirvana
+ac/dc
+rolling stones
+grateful dead
+elvis
+michael jackson
+dolly parton
+kobe
+lebron
+messi
+ronaldo
+trump
+biden
+kamala
+barack obama

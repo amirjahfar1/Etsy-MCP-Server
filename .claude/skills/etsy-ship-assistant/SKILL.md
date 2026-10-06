@@ -70,4 +70,4 @@ Result:
 Repeat the `--- Processing Receipt <id> ---` block per order. Never collapse multiple orders into a single confirmation.
 
 ## When done
-Summarize what shipped, what was skipped, and what still needs to ship later. If overdue orders remain unshipped because the user didn't have tracking yet, call that out so it surfaces again in the next **etsy-morning-briefing**.
+Summarize what shipped, what was skipped, and what still needs to ship later. If overdue orders remain unshipped because the user didn't have tracking yet, call that out so it surfaces again in the next **etsy-morning-briefing**. Offer to sync the orders that just shipped (tracking number, shipped status) into the "Etsy Order" Google Sheet via **etsy-order-sheet-sync**, so the sheet doesn't go stale between explicit sync requests.

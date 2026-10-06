@@ -66,3 +66,4 @@ If everything is genuinely quiet — no new orders, nothing overdue, no new revi
 
 - If orders are overdue or need tracking submitted, hand off to **etsy-ship-assistant** to actually process them.
 - If sales look unusually thin over the window, suggest **etsy-sales-forensics** for a diagnosis.
+- The durable, cross-account order log behind this daily snapshot lives in the "Etsy Order" Google Sheet — see **etsy-order-sheet-sync** if the user wants today's orders saved/updated there.

@@ -22,6 +22,7 @@ can add it later" is not an exception; get it now or don't create the listing ye
 - `who_made`, `when_made` — both set, never left to default.
 - `taxonomy_id` — set to a real, looked-up category, never guessed-and-skipped.
 - `type` — explicitly `physical` / `download` / `both`, never left to the API default.
+- **`sources` — at least one entry, confirmed by the user, before `create_draft_listing` is called (CLAUDE.md's sourcing standing rule, STRICT, 2026-08-04).** This applies to every listing regardless of origin — a named supplier (AliExpress/Merchize/Printify/etc., source = that supplier link) and a custom/in-house product (no supplier link, but still needs a plain-text source like "in-house DTG print") are both required to have an explicit source; "custom" is never itself a substitute for actually stating the source. A listing can have more than one source — capture all given at creation time, not just the first. Don't draft first and ask for the source afterward — get it before creating.
 - **Exactly 13 tags** — every slot filled, none empty, none uppercase, none duplicate
   (see the Tags rules below).
 - **At least 1 image uploaded.** A listing with zero images is incomplete — full stop.
@@ -82,6 +83,11 @@ size the buyer enters at checkout — anything the title/description implies as
 
 **Must get an explicit answer (yes, a value, or an explicit skip) — never silently
 omitted, even though these aren't hard `create_draft_listing` blockers:**
+- **AI-generated artwork disclosure** — if the product's actual design/artwork (not
+  the listing copy) was created using an AI tool, Etsy requires this be disclosed in
+  the description (see `../_shared/etsy-ai-disclosure-guide.md`). Ask whenever the
+  product's source material is AI-generated art; doesn't apply to Claude drafting the
+  listing text itself.
 - `materials` — get at least 1 real material for every physical listing (a genuine
   filtered-search field; a listing that skips it is quietly less discoverable).
 - `styles` (physical, **create-time only** — `update_listing` has no `style`/`styles`
@@ -95,26 +101,24 @@ omitted, even though these aren't hard `create_draft_listing` blockers:**
 
 ## Image alt text — standing default, set automatically, no need to ask
 
-**Updated 2026-07-23 (explicit user instruction, supersedes the old
-"all 13 tags comma-joined on every image" rule below):** each uploaded
-image gets **exactly one tag** as its `alt_text`, not the full tag list.
-Assign the listing's 13 tags to images **in tag order, one tag per image**
-(image 1 → tag 1, image 2 → tag 2, ...); if there are fewer images than
-tags, only the first N tags get used (one per image) and the rest go
-unused for alt-text purposes — don't reuse a tag on a second image just to
-cover every tag. If there are ever more images than tags (13), wrap back
-to tag 1 rather than leaving later images with no alt_text. State the
-image→tag mapping plainly in the write-confirmation payload so it's
-visible before upload, same as any other field.
+**Updated 2026-08-19 (explicit user instruction, STRICT/hard rule — supersedes the 2026-07-23 tag-rotation rule below):** alt_text is now derived from the image's own **renamed, keyword-rich local filename**, not pulled from the tags array.
 
-This is a standing default per explicit user instruction, not something to
-ask about per listing — apply it automatically on every `upload_listing_image`
-call across every skill. Set it at upload time (`alt_text` param) when
-possible; for images already uploaded without it, `upload_listing_image`
-can update an existing image's `alt_text`/`rank` in place by passing its
-`listing_image_id` (no `image_path`) — confirmed live, this does **not**
-require deleting the image first, despite the tool description mentioning
-`listing_image_id` mainly in the context of re-assigning a *deleted* image.
+1. **Rename every gallery image locally before upload** (this was already a jewelry-specific rule — see CLAUDE.md's jewelry standing rule step 6 — it is now a hard, project-wide rule for every skill that uploads listing images, not jewelry-only): generic source filenames (`ChatGPT Image Aug 17...png`, a random UUID filename, etc.) become a keyword-rich, hyphenated name built from the product's core name + matched style/keywords, sequentially numbered (e.g. `octopus-tentacle-antique-ring-2.jpg`, `-3.jpg`). Do this for every non-featured, non-size-chart gallery image before calling `upload_listing_image`.
+2. **Set that image's `alt_text` to the renamed filename itself**, extension stripped and hyphens replaced with spaces (e.g. `octopus-tentacle-antique-ring-2.jpg` → alt_text `octopus tentacle antique ring 2`) — not a tag pulled from the tags array. Filename and alt_text should read as the same string, one in kebab-case for the file, one in plain words for the alt attribute.
+3. **Featured/thumbnail image**: stays on its own naming convention (the `Featured` marker in the filename, per the existing rule) — it is not renamed like the gallery images. Its `alt_text` instead uses the **product's core/plain name** (the same name recorded in that product's intake file's BASIC INFO section), e.g. `adjustable octopus tentacle wrap ring`.
+4. **Size chart image** (when one exists): also stays on its own naming convention (`Size Chart`/`size chart`), and its `alt_text` is simply `size chart` — plain and accurate, not a tag or the product name.
+5. If there are more gallery images than distinct keyword variations to draw on, it's fine for the alt_text to repeat the product's core descriptive phrase across images (all photos are the same product) — this is not the same failure mode the old tag-rotation rule was avoiding (spreading 13 *tags* thin), since filenames/alt_text here describe the product, not enumerate its keyword slots.
+
+Set alt_text at upload time (`alt_text` param) when possible; for images already uploaded without it, `upload_listing_image` can update an existing image's `alt_text`/`rank` in place by passing its `listing_image_id` (no `image_path`) — confirmed live, this does **not** require deleting the image first, despite the tool description mentioning `listing_image_id` mainly in the context of re-assigning a *deleted* image.
+
+**Retroactive scope (explicit user instruction, 2026-08-19):** this rule applies going forward from the point it was adopted — listings published before this rule was written are not retroactively fixed unless the user separately asks for that cleanup pass.
+
+<details>
+<summary>Superseded rule, kept for history (2026-07-23 to 2026-08-19)</summary>
+
+Each uploaded image got **exactly one tag** as its `alt_text`, not the full tag list. The listing's 13 tags were assigned to images **in tag order, one tag per image** (image 1 → tag 1, image 2 → tag 2, ...); if there were fewer images than tags, only the first N tags got used and the rest went unused for alt-text purposes. If there were ever more images than tags (13), it wrapped back to tag 1. This is no longer the active rule — see above.
+
+</details>
 
 ## Final-report verification — mandatory before telling the user a draft is done
 
@@ -145,6 +149,7 @@ all 15 variants added") is expected too, not just silence implying success.
 - **Allowed characters**: letters, numbers, punctuation, mathematical symbols, whitespace, and ™ © ®. The characters **`% : & +` may each be used at most once** in a title — the API rejects a title using any of them twice.
 - **Etsy's own suggested-title feature exists**: `get_listing_details`/`getListing` can return a `suggested_title` field (English-language shops, existing listings only) — worth checking as a sanity comparison when one is available, but never assume it's present.
 - **Search weighting**: Etsy's algorithm weights the **first ~40 characters** most heavily — front-load the primary keyword, don't bury it after descriptive filler.
+- **Rank-first rule (2026-10-07, explicit user instruction):** those first ~40 characters are decided from data, not taste — pull the top 20 ranking listings for the buyer's search term, extract their lead-phrase pattern, and build the title from it. Full procedure, table format and honest limits: `rank-first-title-guide.md`. Every title-writing skill follows it before drafting.
 - **No keyword repetition (2026 guidance).** Repeating the same word/phrase 2-3 times in a title (e.g. "Dad Shirt Father Shirt Personalized Father's Day Dad Gift") no longer helps ranking and actively hurts click-through — it reads as spammy to buyers and Etsy's algorithm has moved past rewarding raw repetition. Use **distinct keyword phrases covering different buyer angles** (what it is → who it's for / occasion → material or style modifier) instead of rephrasing one keyword repeatedly. A good structural pattern: `[Primary Keyword] | [Secondary Keyword + Modifier] | [Occasion or Recipient]`.
 
 ## Tags — confirmed field rules
@@ -162,13 +167,13 @@ all 15 variants added") is expected too, not just silence implying success.
 
 **Explicit user instruction, 2026-07-30, applies to every connected account (not just
 one shop).** Every physical listing's description — every new one created going
-forward, and every existing one already on Etsy — must end with this exact block
-(verbatim, don't paraphrase it):
+forward, and every existing one already on Etsy — must end with this block, verbatim
+except the two day-range placeholders:
 
 ```
 DELIVERY TIME FRAME:
 -------------------------------
-- Our estimated delivery time (processing time included) is around 8-10 business days within US, and 2-3 weeks for International shipping. If you have the exact date that you need the items, please let us know.
+- Our estimated delivery time (processing time included) is around <US_MIN>-<US_MAX> business days within US, and <INTL_MIN>-<INTL_MAX> business days (about <INTL_WEEKS>) for International shipping. If you have the exact date that you need the items, please let us know.
 - For international orders: We will ship from our other warehouses in the EU and Vietnam, depending on the customer's address, to optimize shipping time and cost.
 - Wanna add a personal touch for your item? Feel free to contact us, we will be happy to create the one just for you.
 ***Please note that your order is made uniquely for you, as each item is produced individually after purchase, so we do not accept returns or exchanges.
@@ -177,6 +182,17 @@ We also cannot offer support or replacements for items that have been used or wa
 Thank you for your understanding!
 ```
 
+- **`<US_MIN>-<US_MAX>` and `<INTL_MIN>-<INTL_MAX>` are computed per listing, never
+  hardcoded and never copied from another listing's block.** This section previously
+  showed this block with fixed numbers ("8-10 business days"/"2-3 weeks") pasted
+  in verbatim — that was a documentation bug (it contradicted CLAUDE.md's own standing
+  rule that these numbers must be computed from the listing's real processing +
+  shipping profile) and it caused every listing built or edited against this doc to
+  carry the same wrong "8-10"/"2-3 weeks" text regardless of its actual configured
+  delivery time. Caught and fixed 2026-08-01 during a shop-wide processing/shipping
+  time standardization — see CLAUDE.md's own footer rule for the exact computation
+  (processing_min/max + the US destination's, and slowest international destination's,
+  min/max_delivery_days from the listing's real shipping profile).
 - **Physical listings only.** Digital/download listings don't ship, so this footer
   doesn't apply to them — confirmed with the user 2026-07-30 when bulk-adding this to
   itrat_etsy's catalog (39 physical listings got it; 8 digital SVG/clipart listings
@@ -185,7 +201,8 @@ Thank you for your understanding!
   (`etsy-create-listing`, `etsy-new-listing-copywriter`, `etsy-copy-listing`,
   `etsy-optimize-listing`) — append this block after the rest of the description is
   finalized, not before (it's a fixed footer, not part of the Copy QA Gate's drafted
-  copy — don't run QA rewrites on this block itself, it's pasted verbatim every time).
+  copy — don't run QA rewrites on this block itself, it's pasted verbatim every time
+  except the two computed day ranges).
 - **Every account, not just one shop** — this is a shop-wide policy applied uniformly,
   not something scoped to whichever account happened to request it first.
 - Counts toward the description's overall length (see the 150-400 word ideal above for
@@ -247,6 +264,35 @@ without clearing every item below.
     ever reaches the draft the user sees. This is a shop-style rule (buyers reading
     "China" in the copy hurts perceived quality/handmade positioning), not an Etsy API
     rule, so it won't cause a rejection — but it's a hard check same as the others above.
+9b. **No sourcing-platform or business-model names anywhere buyer-facing** (explicit
+    user instruction, 2026-08-19) — never write "AliExpress", "1688", "dropshipping",
+    "drop ship", "Merchize", "Printify", "Printful", or any other supplier/platform name
+    in a listing's title, tags, or description, **or in a shipping profile's title**
+    (shipping profile names are visible to Etsy and can surface to buyers) — e.g. name a
+    shared jewelry shipping profile "Jewelry Shipping", never "AliExpress Jewelry
+    Shipping". This is the same "buyer never sees the supply chain" principle as rule 9
+    above, just covering the sourcing-platform name itself rather than the origin
+    country. **This does not apply to internal local record-keeping** — the mandatory
+    `sources` field (CLAUDE.md's sourcing standing rule), a product's own
+    `product-details.txt`, and `data/product-registry.json` still name the real supplier/
+    URL exactly as required elsewhere; this rule only bans the name from anything Etsy
+    or a buyer actually sees.
+10. **No branded, trademarked, or licensed franchise/character names anywhere in the
+    title, tags, or description** (standing rule, 2026-08-06, explicit user instruction
+    — see root `CLAUDE.md`). Scan for: franchise/show/movie/game titles ("Avatar: The
+    Last Airbender", "Harry Potter", "Pokemon"), licensed character names, sports team/
+    league names, celebrity names, and third-party brand/logo names ("Nike", "Disney").
+    A generic style/aesthetic word inspired by a franchise ("gothic", "kawaii",
+    "streetwear") is fine — a literal franchise/character/brand name is not. **This is a
+    hard fail, not a style nitpick**: if the draft contains one, do not rewrite around it
+    and keep going — stop, flag the exact term to the user, and do not present or write
+    that copy until it's removed or the user explicitly overrides. Reason this exists:
+    two abbas_etsy listings titled "Appa Hoodie, Avatar The Last Airbender..." (listing
+    ids 4542392204, 4542411318) were confirmed frozen by Etsy — `state` stuck on `edit`,
+    can't be flipped back to `active` via the API — for exactly this violation, the same
+    class of issue that got itrat_etsy permanently suspended (see
+    `../_shared/etsy-production-partners-guide.md` and the "Official Etsy policy
+    reference library" section of root `CLAUDE.md`).
 
 State in the report that this checklist was run (a one-line "QA: passed" note is
 enough) — don't just apply it silently.
