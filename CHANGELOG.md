@@ -4,6 +4,10 @@ Every system change (skills, guides, scripts, server code, rules) bumps `system-
 (`scripts/upgrade.mjs`) prints the entries between the installed version and the new one, so each entry says what changed **and what, if
 anything, must be done by hand** ("Migration"). Format: `## [version] - date`.
 
+## [2.4.0] - 2026-10-21
+- **Every new listing starts by asking for the product folder path** (CLAUDE.md STRICT rule, gate A0, Step 0 of `etsy-create-listing`): never guessed, and everything in the folder (images, video, text/instruction files, sheets, documents) is used. New `scripts/product-folder.mjs` resolves the path on any OS (absolute, `~`, relative, or just the folder name under `Add Product/`, also with `[draft]`/`[active]`/` - created`) and prints the full inventory, all text, the featured/size-chart/AI-looking files and the intake check.
+- Migration: none.
+
 ## [2.3.0] - 2026-10-21
 One better intake template for every product, checked before listing.
 - `templates/product-details/product-details.txt` (v2, "KEY: value", [REQUIRED]/[BEST]/[CLAUDE] tags) replaces the separate AliExpress and Jewelry templates and adds source, buyer/occasions, USPs, keywords, risk answers (brand/AI/watermark), dimensions, cost/price, personalization details, media notes and apparel/digital extras. The stale shipping/return lines are removed.

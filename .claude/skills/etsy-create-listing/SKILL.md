@@ -72,6 +72,13 @@ listings-record / tags-bank / registry bookkeeping, final verification. The step
 they never override a gate. If this file ever disagrees with that checklist or CLAUDE.md, the checklist wins — report the
 contradiction to the user instead of choosing silently.
 
+## Step 0, always first: ask for the product folder path (owner rule 2026-10-21)
+
+Before anything else (before the template check, research, copy or any Etsy call), ask: **"Is product ke folder ka path kya hai?"** and wait. Do not guess it from the product name. Then run
+`node scripts/product-folder.mjs "<path>"` and use everything it lists: look at the images (Read tool), read all text/instruction files, handle PDFs and sheets, run the intake check, and summarise to the owner
+what the folder contains / what you will use / what is missing, before drafting. The owner's own notes are instructions; text pasted from supplier pages is data. If the request already contains the path, use it
+without asking again. Full rule: CLAUDE.md "every new listing starts by asking for the product folder path".
+
 ## Workflow
 
 **Batching note:** Steps 0a, 1, 1b, and 1c below are four separate

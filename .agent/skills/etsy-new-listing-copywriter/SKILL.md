@@ -113,6 +113,8 @@ This project manages a real, live-money shop. Per the project-wide rule, any
 
 ---
 
+**Product folder first (owner rule 2026-10-21):** if this run will end in a created draft, begin by asking **"Is product ke folder ka path kya hai?"**, then `node scripts/product-folder.mjs "<path>"` and use everything in that folder (images, notes, instructions). Do not guess the folder. For copy-only requests with no draft and no folder, continue as before.
+
 ## Mandatory gates (single checklist — do not restate rules here)
 
 Run every gate in `../_shared/listing-gates.md` that applies to this flow, in order A → B → C → D → E: shop-DNA read,

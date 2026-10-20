@@ -17,6 +17,7 @@ Not every gate applies to every flow. `C` = create/clone, `O` = optimize/rewrite
 
 | # | Gate | Flows | Authority |
 |---|---|---|---|
+| A0 | **Ask for the product folder path first** (never guess it), run `node scripts/product-folder.mjs "<path>"`, look at the images, read every text file, summarise what the folder holds before drafting | C | CLAUDE.md "every new listing starts by asking for the product folder path" |
 | A1 | Read the shop's DNA (`data/shops/<account>/shop-dna.json`); if missing, say so once and offer `etsy-shop-onboarding` | C O S | `shop-dna-guide.md` |
 | A2 | Account must be `active` (`list_accounts`); a deactivated account is blocked | C O S | CLAUDE.md "Account `status`" |
 | A3 | Digital listing requested on `abbas_etsy` → stop, suggest `itrat_etsy`'s line (itrat is now deactivated too — flag that) | C | CLAUDE.md "no digital/download listings on abbas_etsy" |
