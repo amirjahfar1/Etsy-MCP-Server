@@ -383,20 +383,19 @@ or Recipient]`
 - The **first ~40 characters** carry the most search weight — they must
   contain the primary keyword phrase from Step 2, verbatim as buyers type
   it, not a prettier paraphrase of it.
-- **No keyword repetition.** Do not use the same word/phrase 2-3 times
-  ("Dad Shirt Father Shirt Dad Gift") — per 2026 guidance it no longer helps
-  ranking and it costs clicks because it reads as spam. Each segment covers
-  a *different* buyer angle: what it is → who it's for or the occasion →
-  material/style/format modifier. If two segments share a word, rewrite one.
-- **Target 130-139 characters** (shop instruction — maximize keyword
-  coverage, don't stop early). If the first pass lands short (e.g. 90-100
-  chars), don't call it done: add another genuine, distinct buyer-search
-  angle — a second material/style modifier, a specific room/placement, a
-  gift-recipient variant, a size/format callout — anything a real buyer
-  might type that the current draft doesn't yet cover. Never fill the gap
-  with padding or repeated words — every added segment must be a real
-  distinct angle, checked against the no-repetition rule above the same as
-  the rest of the title.
+- **Repetition:** the product noun may appear twice ("Octopus Ring, ... Ocean
+  Jewelry, ... Statement Ring" is normal: 41% of winners repeat "ring"). No word
+  three times and no back-to-back rephrasing of the same phrase ("Dad Shirt
+  Father Shirt Dad Gift" reads as spam and costs clicks). Each segment covers a
+  *different* buyer angle: what it is, who it's for or the occasion,
+  material/style/format modifier.
+- **Length is an outcome, not a target** (changed 2026-10-21, replacing the old
+  "target 130-139 characters" shop instruction; the owner can restore it). The
+  market median is 109 characters and only 26% of winners sit in 130-139, so
+  fill characters 1-40 from the rank-first data and then add a segment only if
+  it is an evidenced phrase (>=10% of the sample's tags or titles) covering a
+  new buyer angle. Stopping at 90-120 characters is fine. Never pad. See
+  `../_shared/etsy-seo-standards.md` -> Title and `../_shared/rank-first-title-guide.md`.
 - If the user asks for a "meta title": Etsy has no separate meta-title
   field — the title IS the Google/page headline. Answer with the title.
 
@@ -424,7 +423,7 @@ Step 2's frequency table showed matters in this niche):
 | 2 | Material / format | Product brief |
 | 2 | Occasion (holiday, event, season) | Step 2 + calendar proximity |
 | 2 | Recipient ("gift for her", "teacher gift") | Step 2 gaps |
-| 2 | Use-case / placement ("nursery decor", "cricut project") | Step 2 |
+| 2 | Use-case / placement ("nursery decor", "cricut project"); **for jewelry use the Tag slot model instead** (`../_shared/etsy-seo-standards.md`, `../_shared/tag-templates.md`) | Step 2 |
 | 1-2 | Style / aesthetic ("boho", "minimalist") | Shop voice + niche vocabulary |
 | 1 | Underexploited angle from Step 2's gap analysis | The "win" tag |
 

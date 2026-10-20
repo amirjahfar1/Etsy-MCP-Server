@@ -272,6 +272,22 @@ const TOOLS: Tool[] = [
           description: "Pagination offset (default: 0)",
           minimum: 0,
         },
+        currency: {
+          type: "string",
+          description: "ISO 4217 code (e.g. USD). Adds price_converted/price_converted_currency to every result so prices in other currencies become comparable. Strongly recommended for any price statistics.",
+        },
+        taxonomy_id: {
+          type: "number",
+          description: "Only return listings in this Etsy taxonomy (category) id. Useful to drop noise such as ring dishes or decor from a jewelry search.",
+        },
+        buyer_country: {
+          type: "string",
+          description: "ISO 3166-1 alpha-2 code (e.g. US). Only listings that ship to that country.",
+        },
+        include_description: {
+          type: "boolean",
+          description: "Default true (unchanged behaviour). Set false for bulk research pulls: returns desc_len and desc_first_300 instead of the full description, cutting a 40-result call from ~100 KB to ~30 KB so it no longer overflows to a file.",
+        },
         min_price: {
           type: "number",
           description: "Minimum price in USD",
@@ -868,6 +884,10 @@ async function searchListings(args: any) {
   if (args.max_price) params.max_price = args.max_price;
   if (args.sort_on) params.sort_on = args.sort_on;
   if (args.sort_order) params.sort_order = args.sort_order;
+  if (args.currency) params.currency = args.currency;
+  if (args.taxonomy_id) params.taxonomy_id = args.taxonomy_id;
+  if (args.buyer_country) params.buyer_country = args.buyer_country;
+  const withDescription = args.include_description !== false;
 
   const response = await getPublicClient(args.account).get("/application/listings/active", {
     params,
@@ -878,16 +898,31 @@ async function searchListings(args: any) {
     results: response.data.results.map((listing: any) => ({
       listing_id: listing.listing_id,
       title: listing.title,
-      description: listing.description,
+      ...(withDescription
+        ? { description: listing.description }
+        : { desc_len: (listing.description || "").length, desc_first_300: (listing.description || "").slice(0, 300) }),
       price: listing.price?.amount
         ? `${listing.price.amount / listing.price.divisor} ${listing.price.currency_code}`
         : "N/A",
+      // Only present when the currency param was sent (Etsy returns converted_price then).
+      price_converted: listing.converted_price?.amount
+        ? listing.converted_price.amount / listing.converted_price.divisor
+        : undefined,
+      price_converted_currency: listing.converted_price?.currency_code,
       url: listing.url,
       shop_id: listing.shop_id,
       quantity: listing.quantity,
       state: listing.state,
+      // created_timestamp very likely resets on renewal/sale; original_creation_timestamp is the first-listed date (unverified, see CLAUDE.md).
       created: listing.created_timestamp,
+      original_created: listing.original_creation_timestamp,
       updated: listing.updated_timestamp,
+      num_favorers: listing.num_favorers,
+      taxonomy_id: listing.taxonomy_id,
+      has_variations: listing.has_variations,
+      is_personalizable: listing.is_personalizable,
+      materials: listing.materials,
+      style: listing.style,
       tags: listing.tags,
     })),
   };

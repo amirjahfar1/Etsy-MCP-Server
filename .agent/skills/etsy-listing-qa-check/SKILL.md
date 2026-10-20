@@ -30,7 +30,8 @@ Point users to the other two when they want strategy or competitive positioning,
 - Length ≤140 characters.
 - Primary keyword appears within the first ~40 characters (front-loaded).
 - Characters `% : & +` each appear at most once.
-- No word/phrase repeated 2-3 times (spammy repetition pattern).
+- No word three times and no back-to-back rephrasing of the same phrase (the product noun may appear twice; see Repetition in the SEO standards).
+- Length is advisory only: do **not** flag a title for being under 130 characters (the old 130-139 target was dropped 2026-10-21).
 
 ### Tags
 - Exactly 13 tags present — flag any unused slots.
@@ -47,6 +48,17 @@ Point users to the other two when they want strategy or competitive positioning,
   13 tags that are all textually unique can still cover only two or three real
   buyer intents, which is a search-reach problem this check exists to catch even
   though the near-duplicate check above wouldn't flag it.
+
+### Market fit (advisory; needs the latest research for the listing's category, otherwise skip it and say so)
+Uses the newest `data/research/<category-slug>/<date>/stats.json` (see `../_shared/rank-first-title-guide.md`) and `data/title-patterns.json`.
+- **Head term:** the exact head term is one of the 13 tags. Flag if missing (market median 73%).
+- **Evidence ratio:** at least 10 of 13 tags appear in the category stats (>=2 listings) or in the tags bank with `source: market`. Report "n/13 evidenced".
+  More than 3 unevidenced tags is a flag.
+- **Title lead:** for a *motif* term the exact phrase is in the first 40 characters.
+- **Expired seasonal tags:** a `halloween` tag after Oct 31, `christmas` after Dec 26, `valentine` after Feb 15.
+- **Price band:** a price below the like-for-like p25 or above p75 (advisory only, never a fail; the owner's "price below average" instruction is unchanged).
+- **Material claim:** `925` / `sterling` / `solid gold` in title, tags or materials must match PRODUCT ANALYSIS / the spec sheet; flag for review if the product says plated or alloy.
+- **Tag-to-photo truth:** a format word (stud, hoop, choker, cuff, huggie) must match the product type shown.
 
 ### Description
 - Opening ~160 characters read as a standalone hook (ad-headline style), not a scene-setter.

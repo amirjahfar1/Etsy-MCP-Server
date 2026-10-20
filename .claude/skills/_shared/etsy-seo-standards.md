@@ -145,12 +145,13 @@ all 15 variants added") is expected too, not just silence implying success.
 
 ## Title — confirmed field rules
 - **Max 140 characters.** Applies to physical, digital, and vintage listings alike.
-- **Target 130-139 characters, not just "under 140."** Per shop instruction: a short title (e.g. 90-100 chars) leaves real keyword-coverage on the table — every additional distinct buyer-search angle (material, occasion, recipient, use-case, style) that fits is another way the listing can match a search. Write toward the top of the range by adding genuine, distinct angles, not by padding with repeated words or filler — see the no-repetition rule below, which still applies at 135 chars same as at 100.
+- **Length is an outcome, not a target (changed 2026-10-21; replaces the earlier "target 130-139 characters" shop instruction — owner can restore it, see CLAUDE.md).** In a 16-term / 640-listing jewelry sample the median top-ranked title was **109 characters**, only **26%** sat in 130-139, and the top 10 were not longer than ranks 31-40 (shorter in 11 of 16 terms). Fill characters 1-40 from the rank-first data (`rank-first-title-guide.md`); after that add a segment only if it is an evidenced phrase (seen in >=10% of the sample's tags or titles) that covers a new buyer angle (material, recipient, occasion, motif synonym). Stopping at 90-120 characters is fine; never add a segment just to reach a length. Correlational evidence only: the experiment that would settle it is in `measurement-guide.md`.
 - **Allowed characters**: letters, numbers, punctuation, mathematical symbols, whitespace, and ™ © ®. The characters **`% : & +` may each be used at most once** in a title — the API rejects a title using any of them twice.
 - **Etsy's own suggested-title feature exists**: `get_listing_details`/`getListing` can return a `suggested_title` field (English-language shops, existing listings only) — worth checking as a sanity comparison when one is available, but never assume it's present.
 - **Search weighting**: Etsy's algorithm weights the **first ~40 characters** most heavily — front-load the primary keyword, don't bury it after descriptive filler.
 - **Rank-first rule (2026-10-07, explicit user instruction):** those first ~40 characters are decided from data, not taste — pull the top 20 ranking listings for the buyer's search term, extract their lead-phrase pattern, and build the title from it. Full procedure, table format and honest limits: `rank-first-title-guide.md`. Every title-writing skill follows it before drafting.
-- **No keyword repetition (2026 guidance).** Repeating the same word/phrase 2-3 times in a title (e.g. "Dad Shirt Father Shirt Personalized Father's Day Dad Gift") no longer helps ranking and actively hurts click-through — it reads as spammy to buyers and Etsy's algorithm has moved past rewarding raw repetition. Use **distinct keyword phrases covering different buyer angles** (what it is → who it's for / occasion → material or style modifier) instead of rephrasing one keyword repeatedly. A good structural pattern: `[Primary Keyword] | [Secondary Keyword + Modifier] | [Occasion or Recipient]`.
+- **Head-term placement depends on the term type** (data: `keyword-stats.mjs` `term_type`). *Motif* terms (`octopus ring`, `angel wings ring`, `skeleton necklace`) go **verbatim in the first 40 characters** (about 84% of winners do it), usually first or after one modifier ("Silver Dragon Ring"; titles that *start* with the exact phrase are only 4-32%). *Style* terms (`gothic`, `witchy`, `vintage`) and *format* terms (`adjustable wrap ring`) mostly ride in tags and later segments: winners put them in the first 40 only 15-68% of the time, but use them as an exact tag 83-100% of the time. Do not force a style/format word into the lead just because it is the biggest search.
+- **Repetition:** the product noun may appear twice ("Octopus Ring, ... Ocean Jewelry, ... Statement Ring" is normal: 41% of winners repeat "ring"). No word three times, and no rephrasing the same phrase back-to-back ("Dad Shirt Father Shirt Personalized Father's Day Dad Gift" reads as spam and wastes characters). Prefer distinct keyword phrases covering different buyer angles: what it is, who/what occasion, material or style. A good structural pattern: `[Head term + one modifier] | [Secondary keyword + modifier] | [Occasion or recipient]`.
 
 ## Tags — confirmed field rules
 - **Exactly 13 tag slots.** Each tag **≤20 characters**.
@@ -158,6 +159,24 @@ all 15 variants added") is expected too, not just silence implying success.
 - Etsy rejects a tag that **exactly duplicates another tag on the same listing** or duplicates the title verbatim. Near-duplicate tags (rephrasing the same word instead of covering a new buyer intent) waste a slot even if the API allows them — same "variety over repetition" principle as titles applies here: spread the 13 slots across material, occasion, recipient, use-case, style, and format angles rather than 13 minor variations of one phrase.
 - **Lowercase only — no uppercase letters.** The API itself permits mixed case, but this shop's own style rule is all-lowercase tags (matches how buyers actually type search queries and keeps the 13 slots visually consistent). Flag or fix any tag containing an uppercase character before presenting or writing it — this is a shop-style rule, not an Etsy API rule, so it won't cause a rejection, but it should still be treated as a hard check by every skill that drafts or audits tags.
 - A rewrite/new-listing draft that proposes a >20-char tag, an invalid character, or an uppercase letter is a wasted round-trip once the user has already confirmed it — always check length, character set, and case before presenting or writing a tag list.
+
+## Tag slot model (added 2026-10-21, from a 16-term / 640-listing jewelry sample)
+
+The 13 tags are filled **by slot**, and **every tag needs evidence**: it appears on >=2 listings of this run's top-40 sample (`keyword-stats.mjs` tier core/standard/niche) or in `tags-database.json` with `source: market`. At most **3 "own angle" tags** may lack evidence, and each is labelled "own angle" in the confirmation table. A tag must describe what the photo shows (a huggie is not a "stud"; a plated alloy is not "925"). Why: on the shop's newest 15 listings only ~20% of tags matched anything seen in the market sample (older, researched listings: 78%); a tag no buyer types matches no search.
+
+| Slot | Count | Rule |
+|---|---|---|
+| 1 Head | 1 | The exact buyer head term as typed (`skeleton necklace`, `octopus ring`). Mandatory: a median 73% of winners use it as a tag (shop was at 35%) |
+| 2 Format / type head | 1-2 | `animal wrap ring`, `adjustable ring`, `open band ring`, `dangle earrings` |
+| 3 Motif synonym / motif jewelry | 2 | `tentacle ring`, `serpent ring`, `skeleton pendant`, `octopus jewelry` |
+| 4 Style | 2 | The shop-DNA aesthetic, in its evidenced form only: `gothic ring`, `gothic jewelry`, `punk necklace` |
+| 5 Finish / material | 1 | Colour or finish (`silver octopus ring`). `925` / `sterling` only if spec sheet and photo support it |
+| 6 Audience | 1-2 | `gift for her`, `gift for him` (top-25 tags in 10 and 5 of 16 terms) |
+| 7 Gift intent | 1 | `<motif> lover gift` (`ocean lover gift` 20%, `dragon lover gift` 18%) |
+| 8 Occasion | 1 | Rotates (`christmas gift`); never an expired season (`halloween` after Oct 31) |
+| 9 Own angle | 0-3 | Labelled; no evidence required |
+
+Ready-made 13-tag templates per product type: `tag-templates.md`. Near-duplicate rule clarified: `skeleton necklace` and `skeleton pendant` are different buyer queries, not duplicates; the real waste is rephrasing the *same* query.
 
 ## Description — confirmed field rules
 - **No hard character limit surfaced by the API schema** (practically Etsy allows roughly 10,000 characters), but the **first ~160 characters are what actually show as the meta-description-style snippet** in Etsy search results and Google — write those like an ad headline, not a scene-setting intro.
@@ -313,6 +332,8 @@ The read tools used here don't reliably distinguish a sale price from list price
 - **`materials` / `who_made` / `when_made`**: category-relevant completeness on these affects filtered-search matching, same logic as other attributes.
 
 ## Blind spots — state these plainly, never paper over them
+- **Listing "age" in search data is not reliable.** `created_timestamp` very likely resets on renewal (every 4 months, and on each sale of a multi-quantity listing); the real first-listed date is `original_creation_timestamp` (now returned by `search_listings` as `original_created`). So "most top results are new" may mean "most top results sold recently". Unverified until `original_created` is pulled for a sample. Do not renew or relist listings to look fresh (each renewal costs a listing fee) unless a measured experiment (`measurement-guide.md`) shows a lift.
+- **API search order is not the buyer's results page.** `sort_on=score` is not personalised, location-aware or ad-mixed, and the `keywords` filter *forces* every result to contain the term (so "100% of winners contain the term" is partly selection). Position and tag metrics are less affected than presence metrics.
 - No analytics/*trend* data exists via this API: no historical views-over-time, no
   visitor funnel, no click-through, no conversion data. `getListing` **does** return
   each listing's current cumulative `num_favorers` and, for active listings, a
@@ -335,11 +356,8 @@ These numbers are used by `etsy-new-listing-copywriter`, `etsy-optimize-listing`
 it here — a skill file should reference this section, not hardcode its own copy of
 the number:
 
-- **External benchmark sample size:** top **10-15** `search_listings` results per
-  candidate phrase, relevance-screened first (drop anything not genuinely the same
-  product type before tallying).
-- **"Common" tag/pattern threshold:** appears in **at least half the sample**
-  (e.g. 8+ of 15) — this is also the tags database's `common` vs `unique` cutoff.
+- **External benchmark sample size:** top **40** `search_listings` results (`limit: 40`, one call, `sort_on: score`, with `currency: "USD"` and `include_description: false`), noise-screened with `keyword-stats.mjs --exclude` (ring dishes/holders/boxes are ~30% of some jewelry samples); **>=25 usable** listings or broaden the term. Never tally by eye: run the script.
+- **Tag tiers (replaces the old "common = at least half the sample" bar, which only ever selected the head term):** **core** >=50% of the usable sample, **standard** 10-49%, **niche** 5-9%, **noise** <5%. `common` in the tags database = core + standard.
 - **Internal benchmark window:** trailing **90 days**, listings with **≥5 sales**
   count as winners, need **≥3 qualifying winners** to run the benchmark at all; if
   fewer than 3 at 90 days, widen once to **180 days** before skipping it entirely.

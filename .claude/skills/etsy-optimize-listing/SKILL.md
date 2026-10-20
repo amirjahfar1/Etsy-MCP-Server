@@ -85,7 +85,7 @@ If a field name is unclear on any endpoint, confirm via the read-only `etsy-docs
 
 ## Blind spot to state
 
-This optimizes for the signals it can actually observe — title, tags, price, and sales — because the Etsy API exposes **no traffic/click-through/conversion data** (no views, no favorites trend, no funnel) and **no Ads data**. So the rewrite is a well-grounded hypothesis, not a guarantee. Tell the user to watch **actual sales over the following weeks** as the real ground truth (favorites/views can only be checked manually in Etsy's own seller dashboard — this system has no API access to that data), and to revert or re-optimize if the numbers don't move. If photos are part of the problem, `upload_listing_image`/`upload_listing_video` can actually upload a replacement once the owner has one ready and confirms — but this skill still can't judge photo quality itself, so recommending a reshoot is still a human call.
+This optimizes for the signals it can actually observe — title, tags, price, and sales — because the Etsy API exposes **no traffic/click-through/conversion funnel and no Ads data** (it does return each active listing's *cumulative* `views` and `num_favorers`, which `etsy-sync-check --snapshot` records weekly; judge changes with `../_shared/measurement-guide.md`). So the rewrite is a well-grounded hypothesis, not a guarantee. Tell the user to watch **actual sales over the following weeks** as the real ground truth (cumulative views/favorites are available via the weekly snapshots; search-term and conversion data only in Etsy's own Stats export), and to revert or re-optimize if the numbers don't move. If photos are part of the problem, `upload_listing_image`/`upload_listing_video` can actually upload a replacement once the owner has one ready and confirms — but this skill still can't judge photo quality itself, so recommending a reshoot is still a human call.
 
 ## Report structure
 
@@ -136,10 +136,11 @@ grade 5-7 reading level, no AI-tell phrasing, not
 copied from the competitor benchmark).
 
 ## Watch after applying
-- Track actual sales over the next few weeks — that's the real signal this
-  system can see. Favorites/views can only be checked manually in Etsy's own
-  seller dashboard; the API gives no view/CTR/favorites/conversion data to
-  confirm this in advance.
+- Track actual sales over the next few weeks — that's the real signal. Cumulative
+  views/favorites come from the weekly `etsy-sync-check --snapshot`; log this edit
+  in `data/metrics/<account>-changes.jsonl` and judge it with
+  `../_shared/measurement-guide.md` (14-day wait, 28-day read, control arm). The
+  API gives no CTR/conversion data.
 
 ## Confirmation required
 This is a draft only. Reply "yes / confirm" to apply these exact changes to the

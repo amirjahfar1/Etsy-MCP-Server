@@ -78,7 +78,7 @@ Finding kinds: **live-only** (on Etsy, no record — create one from live state 
 ## Weekly performance snapshot (the only trend data this system can get)
 `getListing` returns cumulative `views` and `num_favorers` for active listings (a snapshot, directional, not exact — `views` can read 0 for
 reasons unrelated to traffic). `--snapshot` appends one row per listing to `data/metrics/<account>.jsonl` each run. Run it **weekly** (or
-via `/schedule`). After 2+ snapshots, compute per-listing view/favorite **deltas** and report the movers: top 3 gaining, top 3 stalled with
+via `/schedule`). Each snapshot row also stores `title_hash` / `tags_hash`, so an edit nobody logged is detectable (reconcile it against `data/metrics/<account>-changes.jsonl`). How to judge whether a change worked (control arm, 14-day wait, 28-day read, signal threshold): `../_shared/measurement-guide.md`. After 2+ snapshots, compute per-listing view/favorite **deltas** and report the movers: top 3 gaining, top 3 stalled with
 age > 14 days. This is the feedback loop for the rank-first title test (compare the delta before vs after a title/thumbnail change; note the
 date of every change so effects aren't misread). Say plainly it is a small, noisy signal and not conversion data; the owner's Etsy Stats CSV
 is the richer source.

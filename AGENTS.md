@@ -11,6 +11,10 @@ another computer/OS: **run the `etsy-setup` skill before anything else** (`.agen
 (macOS / Windows / Linux) and which AI tool (Claude / Antigravity / both), then runs `node scripts/setup.mjs`. Human guide: `SETUP.md`.
 Never ask the user to paste API keys into chat; they go in `etsy-mcp-server/.env`.
 
+## Compatibility rule for any change you make
+
+Every edit must keep working on macOS + Windows and in Claude + Antigravity — see CLAUDE.md "every system update must work on macOS + Windows and in Claude + Antigravity" (Node-only scripts, `path.join`, no machine paths, mirror skills into `.agent/skills`, no host-only tool dependency). Run `node scripts/setup.mjs --check` before finishing.
+
 ## How the project maps onto your tools
 
 | Where | What |
@@ -18,7 +22,7 @@ Never ask the user to paste API keys into chat; they go in `etsy-mcp-server/.env
 | `CLAUDE.md` | The rules. Read first, every session. |
 | `.agent/skills/<name>/SKILL.md` | The skill playbooks (identical copy of `.claude/skills/`). Open the one whose `description` matches the request and follow it. Shared references: `.agent/skills/_shared/`. The ordered mandatory-gate list for any listing work: `.agent/skills/_shared/listing-gates.md`. |
 | MCP servers | `etsy` (own server, ~100 tools), `etsy-docs` (Etsy spec), `google-sheets`. Registered globally by `node scripts/setup.mjs --tool antigravity` (Antigravity ignores project-local MCP config). |
-| `scripts/*.mjs` | Deterministic helpers (no API): `local-integrity.mjs`, `sync-diff.mjs`, `risk-prefilter.mjs`; installer/doctor `setup.mjs`. Run with `node` — same on macOS, Windows, Linux. |
+| `scripts/*.mjs` | Deterministic helpers (no API): `local-integrity.mjs`, `sync-diff.mjs`, `risk-prefilter.mjs`, `term-file.mjs`, `keyword-stats.mjs`; installer/doctor `setup.mjs`. Run with `node` — same on macOS, Windows, Linux. |
 | `data/`, `Add Product/` | Local state and product staging (gitignored, per machine). |
 
 ## Translations of Claude-specific wording in CLAUDE.md and the skills

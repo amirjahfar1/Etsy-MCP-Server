@@ -45,6 +45,12 @@ in the report so the user never mistakes a frequency count for a real
 search-volume number. Frame recommendations as "these phrases repeat across
 top performers, so they're worth testing," not "these get N searches/month."
 
+## Use the statistics script (2026-10-21)
+
+Tallying keywords/tags by eye is error-prone. Save each term's top-40 pull with `node scripts/term-file.mjs` and run
+`node scripts/keyword-stats.mjs data/research/<category-slug>/<date> --exclude "<noise regex>"` (procedure and flags:
+`../_shared/rank-first-title-guide.md`). Report numbers from its output only: tag tiers (core/standard/niche), slots, exact-head-tag %, like-for-like prices.
+
 ## Workflow
 
 ### 1. Nail down the target query set

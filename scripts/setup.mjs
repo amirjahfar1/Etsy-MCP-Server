@@ -150,8 +150,14 @@ if (wantClaude) writeConfig(path.join(ROOT, ".mcp.json"), "Claude Code (project 
 if (wantAnti) {
   writeConfig(path.join(os.homedir(), ".gemini", "antigravity", "mcp_config.json"), "Antigravity (global ~/.gemini/antigravity/mcp_config.json)");
   say("INFO", "Antigravity ignores project-local MCP config, so the global file above is the one that matters. Restart Antigravity after changes.");
-  const skillsOk = exists(path.join(ROOT, ".agent", "skills", "etsy-setup", "SKILL.md"));
-  skillsOk ? say("PASS", ".agent/skills present (Antigravity skills)") : say("WARN", ".agent/skills is missing or outdated", "git pull, or: rsync -a --delete .claude/skills/ .agent/skills/   (Windows: robocopy .claude\\skills .agent\\skills /MIR)");
+}
+// Both skill copies must be identical (Claude reads .claude/skills, Antigravity reads .agent/skills).
+{
+  const walk = (d) => (exists(d) ? fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [path.join(d, e.name)])) : []);
+  const rel = (base) => new Map(walk(base).map((f) => [path.relative(base, f).split(path.sep).join("/"), fs.readFileSync(f, "utf8").replace(/\r\n/g, "\n")]));
+  const a = rel(path.join(ROOT, ".claude", "skills")), b = rel(path.join(ROOT, ".agent", "skills"));
+  const diff = [...new Set([...a.keys(), ...b.keys()])].filter((k) => a.get(k) !== b.get(k));
+  diff.length === 0 ? say("PASS", `.claude/skills and .agent/skills are identical (${a.size} files)`) : say("FAIL", `.claude/skills and .agent/skills differ in ${diff.length} file(s): ${diff.slice(0, 4).join(", ")}${diff.length > 4 ? "…" : ""}`, "Sync: rsync -a --delete .claude/skills/ .agent/skills/   (Windows: robocopy .claude\\skills .agent\\skills /MIR)");
 }
 
 // ---------- 8. smoke test: start the Etsy MCP server and ask for its tool list ----------

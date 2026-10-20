@@ -33,8 +33,9 @@ Not every gate applies to every flow. `C` = create/clone, `O` = optimize/rewrite
 
 | # | Gate | Flows | Authority |
 |---|---|---|---|
-| B1 | **Rank-first title**: top-20 lead-phrase pattern shown, then title built from it | C O S(title edits) | `rank-first-title-guide.md` |
-| B2 | Reference listings pulled → report their **average price** and suggest a price **below** it | C O | CLAUDE.md jewelry rule step 3b (applies to every product type) |
+| B1 | **Rank-first title**: top-40 pulled to a file, `node scripts/keyword-stats.mjs` run, pattern table shown (numbers from the script, never counted by eye), title built from it; length is an outcome (90-120 normal), not a target | C O S(title edits) | `rank-first-title-guide.md` |
+| B1b | **Tag slot model**: 13 tags by slot, exact head term as a tag, >=10 of 13 evidenced, <=3 labelled "own angle", no expired season, no tag the photo contradicts | C O S | `etsy-seo-standards.md` Tag slot model, `tag-templates.md` |
+| B2 | Reference listings pulled → report their **average price** and suggest a price **below** it | C O | CLAUDE.md jewelry rule step 3b (applies to every product type) Also show the **like-for-like** median and p25-p75 (sterling/solid-gold listings excluded when ours is plated alloy) next to the plain average; the instruction itself is unchanged (owner decision pending) |
 | B3 | `taxonomy_id` comes from real reference listings, not memory | C | CLAUDE.md "taxonomy_id is always sourced from real reference listings" |
 | B4 | Copy QA Gate (no em dashes, grade 5-7, no AI-tells, no `AliExpress/dropshipping` words, not copied) — before showing **and** before writing | C O S | `etsy-seo-standards.md` |
 | B5 | `P`: **DELIVERY TIME FRAME** block, numbers computed from this listing's real processing + shipping profile; check the return policy doesn't contradict "no returns" | C O(description) | CLAUDE.md "every listing description carries a computed DELIVERY TIME FRAME block" |
@@ -72,6 +73,7 @@ Not every gate applies to every flow. `C` = create/clone, `O` = optimize/rewrite
 | E1 | Final-report verification — re-read the live listing and check each field actually landed | `etsy-seo-standards.md` "Final-report verification" |
 | E2 | Independent `etsy-listing-qa-check` on the new/changed listing | skill |
 | E3 | If the shop is in its launch week, tick the matching `launch-plan.json` task | `launch-7day-playbook.md` |
+| E4 | **Log the change** for measurement: append `{date, listing_id, fields, old_hash, new_hash, experiment_id, arm}` to `data/metrics/<account>-changes.jsonl`; judge it later per `measurement-guide.md` (14-day wait, 28-day read, control arm) | C O S | `measurement-guide.md` |
 
 ## How skills use this file
 

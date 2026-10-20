@@ -8,6 +8,7 @@
 //   --apply     write live values into the local record for drifted fields (+ a sync_log entry). Local bookkeeping only.
 //   --snapshot  append today's views/num_favorers/price/state per listing to data/metrics/<account>.jsonl
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { ROOT, readJson, exists, isDir, listDir, flag } from "./_lib.mjs";
 
@@ -65,7 +66,9 @@ for (const [lid, lv] of live) if (!records.has(lid)) findings.push({ listing_id:
 if (snapshot) {
   const mdir = path.join(ROOT, "data", "metrics");
   fs.mkdirSync(mdir, { recursive: true });
-  const lines = [...live].map(([lid, lv]) => JSON.stringify({ date: today, listing_id: lid, state: lv.state, views: lv.views, num_favorers: lv.num_favorers, price: lv.price }));
+  // title_hash / tags_hash let a later run detect an edit that was never logged (see _shared/measurement-guide.md).
+  const h = (v) => crypto.createHash("sha1").update(JSON.stringify(v ?? null)).digest("hex").slice(0, 10);
+  const lines = [...live].map(([lid, lv]) => JSON.stringify({ date: today, listing_id: lid, state: lv.state, views: lv.views, num_favorers: lv.num_favorers, price: lv.price, title_hash: h(lv.title), tags_hash: h((lv.tags || []).map((t) => String(t).toLowerCase())) }));
   fs.appendFileSync(path.join(mdir, `${account}.jsonl`), lines.join("\n") + "\n");
 }
 

@@ -30,6 +30,8 @@ the skeleton below rather than treating a missing file as an error.
       "tags": {
         "<tag text — lowercase, per the shop's tag lowercase rule>": {
           "status": "common | unique",
+          "source": "market | own",
+          "own_uses": 0,
           "times_seen": 0,
           "sample_size": 0,
           "sources": [
@@ -46,10 +48,12 @@ the skeleton below rather than treating a missing file as an error.
 
 `times_seen` and `sample_size` are **cumulative across every run that has
 touched this tag**, not reset per run — they answer "across everything we've
-ever researched, how often has this tag shown up." `status` is `common` if
-`times_seen / sample_size >= 0.5` (same "at least half the sample" threshold
-already used across every audit/optimize skill for pattern-detection),
-otherwise `unique`.
+ever researched, how often has this tag shown up." `status` is computed **from market rows only** (`source: "market"`): `common` if
+`times_seen / sample_size >= 0.10` (core >=50% and standard 10-49% in the tag tiers of
+`../_shared/etsy-seo-standards.md`; the old "half the sample" bar only ever selected the head term),
+otherwise `unique`. A tag the shop merely *wrote* on its own listing is saved with
+`source: "own"` and increments `own_uses` only; it never counts as market evidence
+(otherwise a self-written tag reads as 100% "common").
 
 ## When to save (research/audit skills) — always, no confirmation needed
 
