@@ -197,3 +197,12 @@ MIT — see [etsy-mcp-server/README.md](etsy-mcp-server/README.md) for server-sp
 ## Contributing
 
 Issues and pull requests welcome. See [etsy-mcp-server/CONTRIBUTING.md](etsy-mcp-server/CONTRIBUTING.md).
+
+
+---
+
+## Setup and upgrades (any OS, Claude or Antigravity)
+
+- **New machine:** see [`SETUP.md`](SETUP.md) (`node scripts/setup.mjs` asks the OS and the AI tool).
+- **Upgrade an existing install to the latest version:** give Claude or Antigravity this repository link and say "upgrade the existing system". It follows
+  [`UPGRADE.md`](UPGRADE.md): dry-run, backup, replace system files only, keep all local data, rebuild if needed, verify. Version history: [`CHANGELOG.md`](CHANGELOG.md).

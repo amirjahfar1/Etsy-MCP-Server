@@ -33,9 +33,9 @@ Not every gate applies to every flow. `C` = create/clone, `O` = optimize/rewrite
 
 | # | Gate | Flows | Authority |
 |---|---|---|---|
-| B1 | **Rank-first title**: top-40 pulled to a file, `node scripts/keyword-stats.mjs` run, pattern table shown (numbers from the script, never counted by eye), title built from it; length is an outcome (90-120 normal), not a target | C O S(title edits) | `rank-first-title-guide.md` |
+| B1 | **Rank-first title**: top-40 pulled to a file, `node scripts/keyword-stats.mjs` run, pattern table shown (numbers from the script, never counted by eye), title built from it; title uses the full allowed length (target 135-140, max 140) filled with distinct evidenced keywords, never padding | C O S(title edits) | `rank-first-title-guide.md` |
 | B1b | **Tag slot model**: 13 tags by slot, exact head term as a tag, >=10 of 13 evidenced, <=3 labelled "own angle", no expired season, no tag the photo contradicts | C O S | `etsy-seo-standards.md` Tag slot model, `tag-templates.md` |
-| B2 | Reference listings pulled → report their **average price** and suggest a price **below** it | C O | CLAUDE.md jewelry rule step 3b (applies to every product type) Also show the **like-for-like** median and p25-p75 (sterling/solid-gold listings excluded when ours is plated alloy) next to the plain average; the instruction itself is unchanged (owner decision pending) |
+| B2 | Reference listings pulled -> report their **average list price AND average actual sale price after active promotions** (`get_buyer_prices`), % on sale, median discount, and the same for the listing being analysed. The owner decides the price; the system only reports (rule unchanged, 2026-10-21) | C O | CLAUDE.md step 3b; `etsy-seo-standards.md` Actual sale price |
 | B3 | `taxonomy_id` comes from real reference listings, not memory | C | CLAUDE.md "taxonomy_id is always sourced from real reference listings" |
 | B4 | Copy QA Gate (no em dashes, grade 5-7, no AI-tells, no `AliExpress/dropshipping` words, not copied) — before showing **and** before writing | C O S | `etsy-seo-standards.md` |
 | B5 | `P`: **DELIVERY TIME FRAME** block, numbers computed from this listing's real processing + shipping profile; check the return policy doesn't contradict "no returns" | C O(description) | CLAUDE.md "every listing description carries a computed DELIVERY TIME FRAME block" |

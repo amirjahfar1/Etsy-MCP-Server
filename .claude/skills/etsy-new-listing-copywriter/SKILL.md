@@ -389,13 +389,13 @@ or Recipient]`
   Father Shirt Dad Gift" reads as spam and costs clicks). Each segment covers a
   *different* buyer angle: what it is, who it's for or the occasion,
   material/style/format modifier.
-- **Length is an outcome, not a target** (changed 2026-10-21, replacing the old
-  "target 130-139 characters" shop instruction; the owner can restore it). The
-  market median is 109 characters and only 26% of winners sit in 130-139, so
-  fill characters 1-40 from the rank-first data and then add a segment only if
-  it is an evidenced phrase (>=10% of the sample's tags or titles) covering a
-  new buyer angle. Stopping at 90-120 characters is fine. Never pad. See
-  `../_shared/etsy-seo-standards.md` -> Title and `../_shared/rank-first-title-guide.md`.
+- **Use the full length: target 135-140 characters, never above 140** (owner
+  decision 2026-10-21, final: use the maximum so more buyer keywords fit). Fill
+  characters 1-40 from the rank-first data, then add distinct, evidenced
+  keyword phrases (material, recipient, occasion, motif synonym, second style)
+  until the title is within 135-140. If the first pass lands short, do not call
+  it done: find another genuine buyer angle. Never fill the gap with padding or
+  repeated words. See `../_shared/etsy-seo-standards.md` -> Title.
 - If the user asks for a "meta title": Etsy has no separate meta-title
   field — the title IS the Google/page headline. Answer with the title.
 

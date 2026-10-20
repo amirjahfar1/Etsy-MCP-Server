@@ -425,6 +425,30 @@ const TOOLS: Tool[] = [
     },
   },
   {
+    name: "get_buyer_prices",
+    description:
+      "Actual buyer-facing price of up to 100 listings (any shop, public data): list price, the SALE price after any active promotion/coupon sale on the listing, discount %, and when the promotion ends. Compact output (no descriptions). Use it whenever a listing or a competitor sample is analysed for price, so averages are computed on what buyers really pay, not on the pre-discount list price.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        account: {
+          type: "string",
+          description: "Which connected Etsy account's API key to use for this public call (see list_accounts). Defaults to the default account's key.",
+        },
+        listing_ids: {
+          type: "array",
+          items: { type: "number" },
+          description: "Listing ids (max 100). A comma-separated string is also accepted.",
+        },
+        buyer_country: {
+          type: "string",
+          description: "ISO 3166-1 alpha-2 country the price is for (default US). Required by Etsy for buyer_price.",
+        },
+      },
+      required: ["listing_ids"],
+    },
+  },
+  {
     name: "get_trending_listings",
     description:
       "Get trending listings on Etsy. Returns currently popular items.",
@@ -1080,6 +1104,42 @@ async function searchShops(args: any) {
   };
 }
 
+async function getBuyerPrices(args: any) {
+  const ids = Array.isArray(args.listing_ids)
+    ? args.listing_ids
+    : String(args.listing_ids || "").split(",").map((x: string) => x.trim()).filter(Boolean);
+  if (!ids.length) throw new Error("listing_ids is required");
+  if (ids.length > 100) throw new Error("max 100 listing_ids per call");
+  const response = await getPublicClient(args.account).get("/application/listings/batch", {
+    params: { listing_ids: ids.join(","), includes: "BuyerPrice", buyer_country: args.buyer_country || "US" },
+  });
+  const money = (m: any) => (m && m.amount != null ? m.amount / m.divisor : null);
+  return {
+    buyer_country: args.buyer_country || "US",
+    count: response.data.count,
+    results: (response.data.results || []).map((l: any) => {
+      const bp = l.buyer_price || {};
+      const list = money(bp.original_price) ?? money(l.price);
+      const sale = bp.has_discount ? money(bp.discounted_price) : null;
+      return {
+        listing_id: l.listing_id,
+        shop_id: l.shop_id,
+        state: l.state,
+        currency: (bp.original_price || l.price || {}).currency_code,
+        list_price: list,
+        sale_price: sale,
+        effective_price: sale ?? list,
+        has_discount: !!bp.has_discount,
+        discount_pct: bp.discount_percentage ?? (list && sale ? Math.round((100 * (list - sale)) / list) : null),
+        discount_start: bp.discount_start_epoch ?? null,
+        discount_end: bp.discount_end_epoch ?? null,
+        free_shipping: bp.is_free_shipping ?? null,
+        shipping_cost: money(bp.shipping_cost),
+      };
+    }),
+  };
+}
+
 async function getTrendingListings(args: any) {
   const params: any = {
     limit: args.limit || 25,
@@ -1335,6 +1395,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: "text", text: JSON.stringify(await getShopListings(args), null, 2) }] };
       case "search_shops":
         return { content: [{ type: "text", text: JSON.stringify(await searchShops(args), null, 2) }] };
+      case "get_buyer_prices":
+        return { content: [{ type: "text", text: JSON.stringify(await getBuyerPrices(args), null, 2) }] };
       case "get_trending_listings":
         return { content: [{ type: "text", text: JSON.stringify(await getTrendingListings(args), null, 2) }] };
       case "get_shop_reviews":

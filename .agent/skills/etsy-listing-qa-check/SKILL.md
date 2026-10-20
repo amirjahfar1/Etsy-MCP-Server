@@ -31,7 +31,7 @@ Point users to the other two when they want strategy or competitive positioning,
 - Primary keyword appears within the first ~40 characters (front-loaded).
 - Characters `% : & +` each appear at most once.
 - No word three times and no back-to-back rephrasing of the same phrase (the product noun may appear twice; see Repetition in the SEO standards).
-- Length is advisory only: do **not** flag a title for being under 130 characters (the old 130-139 target was dropped 2026-10-21).
+- Title shorter than **130 characters** -> flag as unused keyword space (target 135-140, owner decision 2026-10-21); advisory, with the fix being another distinct evidenced keyword phrase, never padding.
 
 ### Tags
 - Exactly 13 tags present — flag any unused slots.

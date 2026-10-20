@@ -42,7 +42,7 @@ ranks 31-40), and (with `own.json`) the shop's gaps. **If fewer than 25 listings
 | Term type | motif (leads the title) / style or format (tag + later segment) |
 | Top lead 2-grams (count) | skeleton necklace (28), halloween skeleton (6) |
 | Exact head term used as a tag | 100% |
-| Title length: median / share 130-140 | 122 / 35% |
+| Title length: market median / share 130-140 (context only; we use 135-140) | 122 / 35% |
 | Like-for-like price p25 / median / p75 (n) | $17 / $45.37 / $69.99 (14) |
 
 Also state the *price recommendation* per CLAUDE.md step 3b (average + a suggested price) and add the like-for-like median and p25-p75 next
@@ -52,7 +52,7 @@ to the plain average, because sterling/solid-gold listings inflate the average f
 - **Characters 1-40**: follow the term type. *Motif* term: the exact phrase, verbatim, first or after one modifier (`Silver Dragon Ring, …`).
   *Style/format* term: keep the motif + product noun in the lead and carry the style/format word in later segments and in a tag; do not force it first.
 - **After character 40**: add a segment only if it is an evidenced phrase (>=10% of the sample's tags or titles) covering a new buyer angle
-  (material, recipient, occasion, motif synonym). **Length is an outcome**: 90-120 characters is normal (market median 109); never pad to a target.
+  (material, recipient, occasion, motif synonym). **Use the full length** (owner decision 2026-10-21): target 135-140 characters, never above 140, by adding genuine keyword angles, never padding. (The sample's median was 109; that is context, not the target.)
 - The product noun may appear twice; no word three times; no back-to-back rephrasing of the same phrase.
 - Never copy a competitor's title or a long run of it: borrow the *lead phrase and structure*, not the sentence.
 - Shop DNA (`shop-dna-guide.md`) overrides pure market mimicry on voice and on `never_sell` terms. The trademark screen and Copy QA Gate still apply: a

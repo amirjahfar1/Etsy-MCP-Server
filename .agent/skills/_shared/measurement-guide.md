@@ -27,7 +27,7 @@ richer source. Everything below exists so that "I changed the title and it impro
 |---|---|---|---|
 | E1 | Tags with market evidence beat invented long-tail tags | retag 7 of the shop's newest 15 listings to the slot model; keep 8 | causal-likely mechanism, effect size unknown |
 | E2 | Adding the exact head term as a tag raises views | add it to 4 older listings that lack it; keep 4 | correlational so far |
-| E3 | Shorter, evidence-only titles (90-110 chars) do not lose views vs 130+ | trim 3 matched rings; leave 3 | correlational so far |
-| E4 | Prices below the like-for-like p25 hurt trust more than they help conversion | raise 3 under-p25 rings (+$6-9); keep 3 | unknown; amends the "below average" pricing instruction, owner sign-off first |
+| E3 | ~~Shorter titles lose nothing~~ | **Withdrawn 2026-10-21**: the owner decided to use the full title length. Re-open only if the owner asks. | n/a |
+| E4 | ~~Raise under-p25 prices~~ | **Withdrawn 2026-10-21**: pricing is the owner's decision; the system does not propose price experiments. | n/a |
 
 Nothing in this file authorises changing a live listing; it only defines how to judge a change once the owner has approved it.

@@ -69,6 +69,10 @@ for (const f of files) {
   const priceOf = (r) => (typeof r.price_converted === "number" && (r.price_converted_currency || "USD") === "USD" ? r.price_converted : (r.currency || "USD") === "USD" && typeof r.price === "number" ? r.price : null);
   const prices = R.map((r) => ({ r, p: priceOf(r) })).filter((x) => x.p !== null);
   const pAll = prices.map((x) => x.p), pLfl = prices.filter((x) => !PRECIOUS.test(x.r.title + " " + (x.r.tags || []).join(" "))).map((x) => x.p);
+  // actual buyer prices (scripts/merge-buyer-prices.mjs): effective = sale price when a promotion is active, else list price
+  const eff = R.filter((r) => typeof r.effective_price === "number" && (r.price_currency || "USD") === "USD");
+  const effAll = eff.map((r) => r.effective_price), effLfl = eff.filter((r) => !PRECIOUS.test(r.title + " " + (r.tags || []).join(" "))).map((r) => r.effective_price);
+  const onSale = eff.filter((r) => r.sale_price != null), discPcts = onSale.map((r) => r.discount_pct).filter((x) => typeof x === "number");
 
   const leads = new Map(), lead2 = new Map(), lead3 = new Map(), tagc = new Map(), tagWords = new Map(), gramAny = new Map(), sep = { comma: 0, pipe: 0, dash: 0 };
   let inFirst40 = 0, startsWith = 0, headTag = 0, repeatWord = 0, brandDropped = new Set();
@@ -112,6 +116,7 @@ for (const f of files) {
     shops: new Set(R.map((r) => r.shop_id)).size,
     term_type: termType, exact_in_first40_pct: exactInFirst40, starts_with_term_pct: pct(startsWith, N), exact_head_tag_pct: exactHeadTag,
     price_usd: { n: pAll.length, dropped_non_usd: N - pAll.length, min: q(pAll, 0), p25: q(pAll, 0.25), median: q(pAll, 0.5), p75: q(pAll, 0.75), max: q(pAll, 1) },
+    price_sale: eff.length ? { note: "what buyers pay: sale price when a promotion is active, else list price (needs merge-buyer-prices.mjs)", n: eff.length, pct_on_sale: pct(onSale.length, eff.length), median_discount_pct: q(discPcts, 0.5), p25: q(effAll, 0.25), median: q(effAll, 0.5), p75: q(effAll, 0.75), like_for_like: { n: effLfl.length, p25: q(effLfl, 0.25), median: q(effLfl, 0.5), p75: q(effLfl, 0.75) } } : null,
     price_like_for_like: { note: "excludes sterling/925/solid gold/gemstone/tungsten/diamond/platinum listings", n: pLfl.length, p25: q(pLfl, 0.25), median: q(pLfl, 0.5), p75: q(pLfl, 0.75) },
     title: { median_len: q(tl, 0.5), len_hist_pct: { under60: hist(0, 59), "60_99": hist(60, 99), "100_129": hist(100, 129), "130_140": hist(130, 140) }, pct_repeating_a_4plus_letter_word: pct(repeatWord, N), separators_pct: { comma: pct(sep.comma, N), pipe: pct(sep.pipe, N), dash: pct(sep.dash, N) } },
     lead_phrases_first40: { top3word: top(leads, 6, 2), top2gram: top(lead2, 10, 3), top3gram: top(lead3, 8, 2) },
@@ -178,13 +183,15 @@ else if (flag("--md")) {
     console.log(`| Top lead 2-grams (count) | ${t.lead_phrases_first40.top2gram.slice(0, 4).map(([g, c]) => `${g} (${c})`).join(", ")} |`);
     console.log(`| Exact head term used as a tag | ${t.exact_head_tag_pct}% |`);
     console.log(`| Title length: median / share 130-140 | ${t.title.median_len} / ${t.title.len_hist_pct["130_140"]}% |`);
-    console.log(`| Like-for-like price p25 / median / p75 (n) | $${t.price_like_for_like.p25} / $${t.price_like_for_like.median} / $${t.price_like_for_like.p75} (${t.price_like_for_like.n}) |`);
+    if (t.price_sale) console.log(`| Buyer price after active promotions: % on sale / median discount / effective median / like-for-like effective median | ${t.price_sale.pct_on_sale}% / ${t.price_sale.median_discount_pct}% / $${t.price_sale.median} / $${t.price_sale.like_for_like.median} |`);
+    console.log(`| Like-for-like LIST price p25 / median / p75 (n) | $${t.price_like_for_like.p25} / $${t.price_like_for_like.median} / $${t.price_like_for_like.p75} (${t.price_like_for_like.n}) |`);
   }
 } else {
   for (const t of terms) {
     console.log(`\n=== "${t.term}"  (${t.total_results_on_etsy?.toLocaleString?.() ?? t.total_results_on_etsy} on Etsy; sample ${t.sample}, usable ${t.usable}, noise dropped ${t.dropped_noise}, ${t.shops} shops)`);
     console.log(`type: ${t.term_type} | exact phrase in first 40: ${t.exact_in_first40_pct}% | starts with it: ${t.starts_with_term_pct}% | exact head tag: ${t.exact_head_tag_pct}%`);
     console.log(`price USD median $${t.price_usd.median} (n=${t.price_usd.n}, non-USD dropped ${t.price_usd.dropped_non_usd}) | like-for-like median $${t.price_like_for_like.median} (p25 $${t.price_like_for_like.p25} - p75 $${t.price_like_for_like.p75}, n=${t.price_like_for_like.n})`);
+    if (t.price_sale) console.log(`BUYER PRICE (after active promotions, n=${t.price_sale.n}): ${t.price_sale.pct_on_sale}% of listings on sale, median discount ${t.price_sale.median_discount_pct}% | effective median $${t.price_sale.median} (p25 $${t.price_sale.p25} - p75 $${t.price_sale.p75}) | like-for-like effective median $${t.price_sale.like_for_like.median} (n=${t.price_sale.like_for_like.n})`);
     console.log(`title: median ${t.title.median_len} chars, hist ${JSON.stringify(t.title.len_hist_pct)}, repeats a word ${t.title.pct_repeating_a_4plus_letter_word}%, separators ${JSON.stringify(t.title.separators_pct)}`);
     console.log(`lead 2-grams: ${t.lead_phrases_first40.top2gram.slice(0, 6).map(([g, c]) => `${g} (${c})`).join(", ")}`);
     console.log(`tags (${t.tags.pct_using_13}% use 13): ${t.tags.top_tags.slice(0, 10).map((x) => `${x.tag} ${x.pct}% [${x.tier}/${x.slot}]`).join(", ")}${t.tags.brand_tags_removed.length ? `  | brand tags removed: ${t.tags.brand_tags_removed.join(", ")}` : ""}`);

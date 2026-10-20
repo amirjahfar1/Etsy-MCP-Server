@@ -11,6 +11,10 @@ another computer/OS: **run the `etsy-setup` skill before anything else** (`.agen
 (macOS / Windows / Linux) and which AI tool (Claude / Antigravity / both), then runs `node scripts/setup.mjs`. Human guide: `SETUP.md`.
 Never ask the user to paste API keys into chat; they go in `etsy-mcp-server/.env`.
 
+## Upgrading an existing installation
+
+If the user gives you the GitHub repo link (`https://github.com/amirjahfar1/Etsy-MCP-Server`) and asks to upgrade/update the existing system, follow `UPGRADE.md` (skill `etsy-system-upgrade`): dry-run first, ask, apply, check customisations, run `node scripts/setup.mjs --check`, restart the tool. It never touches `.env`, `accounts.json`, `sheets-*.json`, `.mcp.json`, `data/`, `Add Product/`. Old installs have no `scripts/upgrade.mjs`: clone the repo to a temp folder and run the clone's `scripts/upgrade.mjs --project "<existing folder>"`.
+
 ## Compatibility rule for any change you make
 
 Every edit must keep working on macOS + Windows and in Claude + Antigravity — see CLAUDE.md "every system update must work on macOS + Windows and in Claude + Antigravity" (Node-only scripts, `path.join`, no machine paths, mirror skills into `.agent/skills`, no host-only tool dependency). Run `node scripts/setup.mjs --check` before finishing.

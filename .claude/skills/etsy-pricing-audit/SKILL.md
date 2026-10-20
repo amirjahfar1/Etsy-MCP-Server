@@ -42,6 +42,7 @@ read comparables, not just compare headline numbers.
    `find_all_active_listings_by_shop`) and audit them — for large shops, confirm
    whether they want the whole catalog or the top sellers / a sample.
 
+2a. **Actual sale price (mandatory, 2026-10-21).** For every target listing AND every market-sample listing call `get_buyer_prices` (up to 100 ids per call, `buyer_country` US unless the shop sells elsewhere) and report, for the shop and for the market: average **list** price, average **effective** price after active promotions, % currently on sale, median discount, and when the promotion ends. Judge "underpriced/overpriced" on like-for-like (sale vs sale, list vs list). This audit still only reports and recommends; it never changes a price, and the owner's pricing rule is unchanged.
 2. **Get current price + context per listing.** Call `get_listing_details` for
    each target listing to capture current price, title, tags, materials, and
    description. You need the description/attributes to judge whether an outlier is
