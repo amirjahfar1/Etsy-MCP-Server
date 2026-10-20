@@ -59,6 +59,8 @@ below are verified against the live Etsy API schema (`etsy-docs` MCP,
 uncertain at payload-build time, confirm via `etsy-docs` (`get_endpoint`,
 `search_etsy_api`), never guess.
 
+**What the owner has to provide for a new listing** (one page, by product type): `../_shared/new-listing-requirements.md`.
+
 ## Mandatory gates (single checklist — do not restate rules here)
 
 Run every gate in `../_shared/listing-gates.md` that applies to this flow, in order A → B → C → D → E: shop-DNA read,

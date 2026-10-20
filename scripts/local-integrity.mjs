@@ -48,6 +48,16 @@ for (const [key, [p, rec]] of records) {
   else if (regIndex.get(key) !== pid) add("high", acct, lid, "pid-mismatch", `record=${pid} registry=${regIndex.get(key)}`);
   if (!rec.sources || !rec.sources.length) add("high", acct, lid, "no-sources", "sources array empty/missing (hard rule: every product needs a source)");
 
+  // complete-snapshot checks (records created/refreshed by scripts/ingest-snapshot.mjs carry a `snapshot` block + raw/snapshot.json)
+  if (path.basename(p) === "record.json") {
+    if (!rec.snapshot) add("low", acct, lid, "no-snapshot", "legacy record: not a complete live snapshot (no raw/snapshot.json, variants/personalization/profiles may be missing); run a deep sync");
+    else {
+      if (!exists(path.join(path.dirname(p), "raw", "snapshot.json"))) add("med", acct, lid, "snapshot-raw-missing", "record says it was snapshotted but raw/snapshot.json is gone");
+      if (rec.snapshot.complete === false) add("med", acct, lid, "snapshot-incomplete", "last snapshot had missing parts: " + (rec.snapshot.missing || []).slice(0, 3).join("; "));
+      if (rec.snapshot.images_live != null && rec.snapshot.images_local < rec.snapshot.images_live) add("med", acct, lid, "media-not-downloaded", `${rec.snapshot.images_local}/${rec.snapshot.images_live} images saved locally`);
+    }
+  }
+
   const ld = rec.listing_data || {};
   if (Array.isArray(ld.tags)) {
     if (ld.tags.length !== 13) add("med", acct, lid, "tag-count", `${ld.tags.length} tags (expected 13)`);

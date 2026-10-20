@@ -425,6 +425,29 @@ const TOOLS: Tool[] = [
     },
   },
   {
+    name: "get_shop_profiles",
+    description:
+      "Everything a listing can be attached to in one shop, in ONE call: all shipping profiles (each with destinations and upgrades), return policies, processing profiles, shop sections and production partners. Read-only. Used to map a listing onto another account (exact clone) and by shop onboarding. Save the result and feed it to scripts/ingest-snapshot.mjs (writes data/shops/<account>/profiles.json).",
+    inputSchema: {
+      type: "object",
+      properties: { account: { type: "string", description: "Which connected Etsy account to read (see list_accounts). Defaults to the default account." } },
+    },
+  },
+  {
+    name: "get_listing_snapshot",
+    description:
+      "COMPLETE, labelled snapshot of up to 10 of your own listings in ONE call, so nothing is missed when a live listing is saved locally or cloned to another account: the full listing (all fields, every image with URLs, video, personalization questions), the inventory/variations, variation images, the shipping profile (with destinations and upgrades), return policy, processing profile, shop section, buyer price/active promotion, and the shop's production partners. Read-only. Feed the saved result to scripts/ingest-snapshot.mjs, which builds the local record and downloads the media. Each part carries {ok,data|error} so a failed part is visible, never silently absent.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        account: { type: "string", description: "Which connected Etsy account owns the listings (see list_accounts). Defaults to the default account." },
+        listing_ids: { type: "array", items: { type: "number" }, description: "1-10 listing ids of this account (any state: active, inactive/draft, ...). A comma-separated string is also accepted." },
+        buyer_country: { type: "string", description: "Country for the buyer price (default US)." },
+      },
+      required: ["listing_ids"],
+    },
+  },
+  {
     name: "get_buyer_prices",
     description:
       "Actual buyer-facing price of up to 100 listings (any shop, public data): list price, the SALE price after any active promotion/coupon sale on the listing, discount %, and when the promotion ends. Compact output (no descriptions). Use it whenever a listing or a competitor sample is analysed for price, so averages are computed on what buyers really pay, not on the pre-discount list price.",
@@ -1104,6 +1127,74 @@ async function searchShops(args: any) {
   };
 }
 
+async function getShopProfiles(args: any) {
+  const accountName = resolveAccountName(args.account);
+  const account = getAccount(accountName);
+  const client = getOauthClient(accountName);
+  const shopId = account.shop_id;
+  const safe = async (fn: () => Promise<any>) => {
+    try { return { ok: true, data: (await fn()).data }; }
+    catch (e: any) { return { ok: false, status: e.response?.status ?? null, error: e.response?.data?.error || e.message }; }
+  };
+  const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  const shipList: any = await safe(() => client.get(`/application/shops/${shopId}/shipping-profiles`));
+  const shipping: any[] = [];
+  for (const p of (shipList.ok ? shipList.data.results || [] : [])) {
+    const full = await safe(() => client.get(`/application/shops/${shopId}/shipping-profiles/${p.shipping_profile_id}`));
+    shipping.push(full.ok ? full.data : { ...p, _error: (full as any).error });
+    await pause(120);
+  }
+  const returnPolicies = await safe(() => client.get(`/application/shops/${shopId}/policies/return`));
+  const processing = await safe(() => client.get(`/application/shops/${shopId}/readiness-state-definitions`));
+  const sections = await safe(() => client.get(`/application/shops/${shopId}/sections`));
+  const partners = await safe(() => client.get(`/application/shops/${shopId}/production-partners`));
+  return {
+    kind: "etsy-shop-profiles", account: accountName, shop_id: shopId, fetched_at: new Date().toISOString(),
+    shipping_profiles: shipList.ok ? { ok: true, data: { results: shipping } } : shipList,
+    return_policies: returnPolicies, processing_profiles: processing, sections, production_partners: partners,
+  };
+}
+
+async function getListingSnapshot(args: any) {
+  const accountName = resolveAccountName(args.account);
+  const account = getAccount(accountName);
+  const client = getOauthClient(accountName);
+  const shopId = account.shop_id;
+  const ids: number[] = (Array.isArray(args.listing_ids) ? args.listing_ids : String(args.listing_ids || "").split(","))
+    .map((x: any) => Number(x)).filter((x: number) => x > 0);
+  if (!ids.length) throw new Error("listing_ids is required");
+  if (ids.length > 10) throw new Error("max 10 listing_ids per call (call again for more)");
+
+  const safe = async (fn: () => Promise<any>) => {
+    try { return { ok: true, data: (await fn()).data }; }
+    catch (e: any) { return { ok: false, status: e.response?.status ?? null, error: e.response?.data?.error || e.message }; }
+  };
+  const cache = new Map<string, Promise<any>>();
+  const once = (key: string, fn: () => Promise<any>) => { if (!cache.has(key)) cache.set(key, safe(fn)); return cache.get(key)!; };
+  const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const buyerPrices = await safe(() => getPublicClient(accountName).get("/application/listings/batch", {
+    params: { listing_ids: ids.join(","), includes: "BuyerPrice", buyer_country: args.buyer_country || "US" },
+  }));
+  const listings: any[] = [];
+  for (const id of ids) {
+    const listing = await safe(() => client.get(`/application/listings/${id}`, { params: { includes: "Images,Videos,Personalization" } }));
+    const L: any = listing.ok ? (listing as any).data : {};
+    const inventory = await safe(() => client.get(`/application/listings/${id}/inventory`));
+    const variationImages = L.has_variations ? await safe(() => client.get(`/application/shops/${shopId}/listings/${id}/variation-images`)) : null;
+    const readinessId = L.readiness_state_id ?? (inventory as any).data?.products?.[0]?.offerings?.[0]?.readiness_state_id ?? null;
+    const shippingProfile = L.shipping_profile_id ? await once(`sp${L.shipping_profile_id}`, () => client.get(`/application/shops/${shopId}/shipping-profiles/${L.shipping_profile_id}`)) : null;
+    const returnPolicy = L.return_policy_id ? await once(`rp${L.return_policy_id}`, () => client.get(`/application/shops/${shopId}/policies/return/${L.return_policy_id}`)) : null;
+    const processingProfile = readinessId ? await once(`pr${readinessId}`, () => client.get(`/application/shops/${shopId}/readiness-state-definitions/${readinessId}`)) : null;
+    const section = L.shop_section_id ? await once(`sec${L.shop_section_id}`, () => client.get(`/application/shops/${shopId}/sections/${L.shop_section_id}`)) : null;
+    const bp = (buyerPrices as any).ok ? ((buyerPrices as any).data.results || []).find((r: any) => r.listing_id === id)?.buyer_price ?? null : null;
+    listings.push({ listing_id: id, listing, inventory, variation_images: variationImages, shipping_profile: shippingProfile, return_policy: returnPolicy, processing_profile: processingProfile, processing_profile_id: readinessId, shop_section: section, buyer_price: bp });
+    await pause(150);
+  }
+  const productionPartners = await once("pps", () => client.get(`/application/shops/${shopId}/production-partners`));
+  return { kind: "etsy-listing-snapshot", account: accountName, shop_id: shopId, fetched_at: new Date().toISOString(), buyer_country: args.buyer_country || "US", production_partners: productionPartners, listings };
+}
+
 async function getBuyerPrices(args: any) {
   const ids = Array.isArray(args.listing_ids)
     ? args.listing_ids
@@ -1395,6 +1486,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: "text", text: JSON.stringify(await getShopListings(args), null, 2) }] };
       case "search_shops":
         return { content: [{ type: "text", text: JSON.stringify(await searchShops(args), null, 2) }] };
+      case "get_shop_profiles":
+        return { content: [{ type: "text", text: JSON.stringify(await getShopProfiles(args), null, 2) }] };
+      case "get_listing_snapshot":
+        return { content: [{ type: "text", text: JSON.stringify(await getListingSnapshot(args), null, 2) }] };
       case "get_buyer_prices":
         return { content: [{ type: "text", text: JSON.stringify(await getBuyerPrices(args), null, 2) }] };
       case "get_trending_listings":

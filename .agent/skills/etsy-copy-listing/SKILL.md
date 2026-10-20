@@ -35,6 +35,8 @@ description: >-
   fresh research or explicit user confirmation instead.
 ---
 
+> **Want the listing copied exactly as it is, with no rewriting and no questions?** Use `etsy-clone-exact` instead. This skill (copy-listing) researches and rewrites the copy and re-asks price, shipping and personalization.
+
 # Etsy Copy Listing — Clone the Structure, Research the Copy, Build Once
 
 This skill exists for a specific, explicit strategy: take a proven/"winning"

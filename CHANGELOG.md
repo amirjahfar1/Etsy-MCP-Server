@@ -4,6 +4,14 @@ Every system change (skills, guides, scripts, server code, rules) bumps `system-
 (`scripts/upgrade.mjs`) prints the entries between the installed version and the new one, so each entry says what changed **and what, if
 anything, must be done by hand** ("Migration"). Format: `## [version] - date`.
 
+## [2.2.0] - 2026-10-21
+Complete live-listing sync, exact clone to another account, new-listing checklist.
+- **Complete local copy of live listings**: new MCP tools `get_listing_snapshot` (everything about up to 10 listings in one labelled call) and `get_shop_profiles`; `scripts/ingest-snapshot.mjs` builds
+  `raw/snapshot.json`, a full `record.json` (variants, personalization, profiles, buyer price...) and **downloads the image/video files**; `local-integrity` flags `no-snapshot` / `snapshot-incomplete` / `media-not-downloaded`.
+- **Exact clone** (`etsy-clone-exact`, `scripts/clone-plan.mjs`, `scripts/clone-verify.mjs`): a listing is copied to another account field for field; only Etsy's own hard limits can stop it, everything else is a warning.
+- `_shared/new-listing-requirements.md`: one page of what a new listing needs (owner vs system vs Etsy).
+- Migration: rebuild the MCP server (`node scripts/setup.mjs`) and **restart Claude/Antigravity** so `get_listing_snapshot` / `get_shop_profiles` appear. Existing records stay valid; run a deep sync (`etsy-sync-check`, Layer 2b) to turn legacy records into complete ones.
+
 ## [2.1.0] - 2026-10-21
 Evidence-based listing optimization, actual sale prices, upgrade system.
 - **Titles use the full allowed length** (target 135-140, never above 140), filled with distinct evidenced keyword phrases, never padding (owner decision).

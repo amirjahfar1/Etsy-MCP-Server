@@ -75,6 +75,12 @@ Not every gate applies to every flow. `C` = create/clone, `O` = optimize/rewrite
 | E3 | If the shop is in its launch week, tick the matching `launch-plan.json` task | `launch-7day-playbook.md` |
 | E4 | **Log the change** for measurement: append `{date, listing_id, fields, old_hash, new_hash, experiment_id, arm}` to `data/metrics/<account>-changes.jsonl`; judge it later per `measurement-guide.md` (14-day wait, 28-day read, control arm) | C O S | `measurement-guide.md` |
 
+## Exact clone (`etsy-clone-exact`) uses a reduced set
+
+A mechanical, field-for-field copy of a live listing to another account does **not** run the research/rewrite/ask gates (A5-A9, A11, B1-B6 are warnings at most, never stops). It keeps:
+A2 (target account active), A10 (production partner: Etsy-hard), C0/C1 (one table covering the draft and all media), C2 (create-time limits), C7 (document new API errors),
+D1-D3 and D5 (record, registry under the same `product_id`, sources copied, sheet), E1 (verify with `clone-verify.mjs`). Details: `.claude/skills/etsy-clone-exact/SKILL.md`.
+
 ## How skills use this file
 
 Each listing skill carries one short block at the top of its workflow:

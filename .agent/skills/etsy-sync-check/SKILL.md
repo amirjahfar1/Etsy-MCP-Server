@@ -54,6 +54,15 @@ node scripts/sync-diff.mjs <account> <live.json> --apply                        
 Finding kinds: **live-only** (on Etsy, no record — create one from live state per the listings-record rule, don't just flag it),
 **record-only** (record but Etsy didn't return it — deleted, or in a state not fetched), **drift** (field-level local vs live).
 
+### Layer 2b: Deep sync (complete local copy of live listings, added 2026-10-21)
+The compact diff above only compares ~15 fields. **A listing is "synced" only when its complete local copy exists:** every listing field, all variations with prices, personalization questions, every
+image and the video as files, the shipping profile (destinations, costs, delivery days), return policy, processing profile, section, production partners and the active sale price, plus the untouched API answers in
+`raw/snapshot.json`. Use it for: every **live-only** listing, after any batch publish, before an exact clone, and once for each legacy record (`no-snapshot` in `local-integrity`).
+1. Haiku read-only `Agent`, per batch of **<= 10 listing ids**: call `get_listing_snapshot` (`account`, `listing_ids`) and report only the saved output path(s) (never paste data). Also once per account: `get_shop_profiles`.
+2. `node scripts/ingest-snapshot.mjs <saved output> [...]` (downloads the media). It prints, per listing, `✔/✘`, images N/N, video, variants, personalization and a **MISSING:** line for anything absent or failed. Re-run the failed ones.
+3. Existing local-only fields (`sources`, `product_id`, notes) are preserved. The script's **TODO** lines (unresolved `product_id`, missing `sources`) must be resolved with the owner: sources are a hard rule.
+4. `node scripts/local-integrity.mjs` must show no `snapshot-incomplete` / `media-not-downloaded` for the listings you just synced.
+
 ### Layer 3 — Shop-level drift (cheap, main model)
 - `get_shop` per active account: compare `shop_name`/`shop_id` to `accounts.json`. A mismatch is reported (and `shop-dna.json`'s
   `live_snapshot.etsy_shop_name_drift` set); **ask before editing `accounts.json`** (it holds credentials; only the `shop_name` field changes).
