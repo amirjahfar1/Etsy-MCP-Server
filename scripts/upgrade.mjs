@@ -84,8 +84,13 @@ if (sameFolder && hasOrigin) {
   changedFiles = ns.filter((l) => !l.startsWith("A")).map((l) => l.split("\t").slice(1).join("\t")); newFiles = ns.filter((l) => l.startsWith("A")).map((l) => l.split("\t")[1]);
   out(`\n${newFiles.length} new file(s), ${changedFiles.length} changed/removed file(s).`);
   if (DRY) { out("\n(dry run: nothing changed)"); process.exit(0); }
+  const lr = git(project, "rev-list", "--left-right", "--count", `HEAD...origin/${branch}`).stdout.trim().split(/\s+/).map(Number);
+  if (lr[0] > 0) die(`Your branch has ${lr[0]} local commit(s) that origin/${branch} does not, so a fast-forward is impossible. Merge or rebase by hand (nothing was changed).`);
   const m = git(project, "merge", "--ff-only", `origin/${branch}`);
-  if (m.status !== 0) die("Fast-forward is not possible (your branch has local commits that origin does not). Merge or rebase by hand:\n" + m.stderr);
+  if (m.status !== 0) {
+    if (/untracked working tree files would be overwritten/i.test(m.stderr)) die("Untracked local files would be overwritten by the upgrade (for example a hand-copied scripts/upgrade.mjs):\n" + m.stderr + "\nMove or delete those files (keep a copy if they hold your changes) and run again. Nothing was changed.");
+    die("git merge --ff-only failed:\n" + m.stderr);
+  }
   after = readVersion(project);
   out("\n✔ Fast-forwarded to origin/" + branch + ". Roll back with: git reset --hard ORIG_HEAD");
   source = project;
