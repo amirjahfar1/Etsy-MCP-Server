@@ -1,0 +1,129 @@
+PRODUCT DETAILS (v2): fill in and hand off
+============================================================================================
+Format: har line "KEY: value" hai. Value sirf ":" ke baad likhein (agli lines bhi chalti hain agar 2 spaces se shuru hon).
+ - Lines jo "#" se shuru hon sirf madad hain, unko mat chhedein.
+ - Jo field apply nahi hoti wahan "N/A" likhein. Khali chhodne ka matlab "abhi nahi bataya" hai.
+ - [REQUIRED] ke baghair listing nahi ban sakti. [BEST] jitni zyada bharein listing utni behtar.
+ - [CLAUDE] wale section Claude khud bharta hai (tasveer aur URL dekh kar), aap khali chhodein.
+ - Check karne ke liye:  node scripts/check-product-details.mjs "<product folder>"
+ - Isko is folder ke bahar ya andar kisi extra .txt/.png me bhi detail de sakte hain: Claude poora folder padhta hai.
+
+=== 1. ACCOUNT AUR PRODUCT TYPE ===
+# Account ka naam waisa hi jaisa list_accounts me hai (active accounts hi). Deactivated account block hota hai.
+ACCOUNT [REQUIRED]:
+# jewelry | apparel | home-decor | accessories | personalized-gift | digital | other
+PRODUCT_TYPE [REQUIRED]:
+# physical ya digital. (abbas_etsy par digital allowed nahi)
+PHYSICAL_OR_DIGITAL [REQUIRED]:
+# listing draft ban kar ruk jaye ya publish bhi ho jaye?  draft | active
+PUBLISH_AS [BEST]: draft
+
+=== 2. SOURCE (hard rule: bina source ke draft nahi banta) ===
+# Supplier link (AliExpress/Merchize/Printify...). Ek se zyada source ho to har ek nayi line par.
+SOURCE [REQUIRED]:
+# AliExpress product ID (folder ke naam wali) agar link me na ho.
+ALIEXPRESS_ID [BEST]:
+# Supplier ka naam: AliExpress | Merchize | Printify | in-house | other
+SUPPLIER [BEST]:
+
+=== 3. PRODUCT KYA HAI ===
+# Core/plain naam, jaise "adjustable viking wolf ring". [CLAUDE] jewelry me khud bharta hai.
+PRODUCT_NAME [BEST]:
+# Subfolder category, jaise Rings / Necklaces / Hoodies.
+CATEGORY [BEST]:
+# 3 sachi, khaas baatein jo is product ko doosron se alag karti hain (ye copy me use hoti hain).
+UNIQUE_SELLING_POINTS [BEST]:
+# Kaun khareedega? men / women / unisex / gift buyers, umar, mulk.
+TARGET_BUYER [BEST]:
+# Kab/kis mauqe par: birthday, anniversary, Halloween, Christmas, daily wear...
+OCCASIONS [BEST]:
+# Aap ka andaza style/vibe (gothic, boho...). Jewelry me Claude tasveer se confirm karta hai.
+STYLE_VIBE [BEST]:
+
+=== 4. KEYWORDS AUR RESEARCH ===
+# Competitor / apni mil-julti listings ke IDs ya URLs (3-5). Jewelry me style match ke BAAD yahan denge.
+REFERENCE_LISTINGS [BEST]:
+# Koi khaas keyword jo zaroor use karna hai (buyer kya type karta hai).
+MUST_USE_KEYWORDS [BEST]:
+# Koi lafz jo kabhi use nahi karna.
+AVOID_WORDS [BEST]:
+
+=== 5. RISK CHECK (sach batayein: ye listing freeze se bachata hai) ===
+# Kya product/design/tasveer me koi brand, logo, franchise, character, celebrity ya team hai? yes/no (+ naam). yes ho to Claude sirf EK baar poochta hai "list it anyway?".
+BRAND_OR_CHARACTER_IN_PRODUCT [REQUIRED]:
+# Kya tasveeren AI (ChatGPT/Midjourney...) se bani hain? yes/no. yes ho to description me disclosure aati hai.
+AI_GENERATED_IMAGES [REQUIRED]:
+# Kya supplier ka watermark/logo tasveer par hai? yes/no
+WATERMARK_ON_IMAGES [BEST]:
+
+=== 6. PRODUCT FACTS (description ki sachai yahan se aati hai) ===
+# Asli material + finish, jaise "zinc alloy, antique silver plating". 925/sterling tab likhein jab supplier spec aur photo dono confirm karein.
+MATERIAL_AND_FINISH [REQUIRED]:
+# Size: ring ka adjustable range ya US sizes, necklace chain length, pendant mm, bracelet circumference, kapre ke measurements. Jewelry me MANDATORY; adjustable ho to "adjustable, fits most".
+DIMENSIONS_SIZE [REQUIRED for jewelry/apparel]:
+COLORS_FINISHES [BEST]:
+WEIGHT [BEST]:
+# Box/pouch/packaging me kya aata hai.
+WHATS_INCLUDED [BEST]:
+CARE_INSTRUCTIONS [BEST]:
+# AliExpress ka spec-sheet text yahan paste karein (hum apne alfaaz me likhte hain, copy nahi).
+SPEC_SHEET_PASTE [BEST]:
+
+=== 7. VARIATIONS AUR PRICE ===
+# Max 2 axes. Misaal:  Size: 6,7,8,9   |   Color: Gold,Silver
+VARIATION_AXES [BEST]:
+# Supplier ki cost (shipping samet), har variant ki alag ho to alag likhein. Margin isi se nikalta hai.
+COST_PRICE [BEST]:
+# Aap ka tay kiya hua selling (list) price, har variant ka. Price ka faisla hamesha aap ka hai; hum sirf market ka list aur asli sale price dikhate hain.
+SELLING_PRICE [REQUIRED]:
+# Agar shop par sale chal rahi hai/chalani hai to % aur kab tak (sirf jaankari ke liye, listing me nahi jaati).
+SALE_PLAN [BEST]:
+# Per variant quantity. Default 999.
+QUANTITY [BEST]: 999
+
+=== 8. SHIPPING, PROCESSING, RETURNS ===
+# Khali chhodein to account ka standard profile use hoga: jewelry = shared "Jewelry Shipping" (processing 3-5, transit 10-15 din, US free / baqi $5). Sirf exception likhein.
+SHIPPING_EXCEPTION [BEST]:
+# Default: existing 3-5 days.
+PROCESSING_TIME [BEST]: 3-5 days
+# Default: no returns / no exchanges (description ka DELIVERY TIME FRAME footer bhi yehi kehta hai). Agar returns chahiye to likhein: footer ko badalna padega.
+RETURN_POLICY [BEST]: no returns, no exchanges
+
+=== 9. PERSONALIZATION ===
+# Kya buyer checkout par kuch bhejta hai (naam/text/photo/size)? yes/no
+PERSONALIZED [REQUIRED]:
+# yes ho to exact kya poochna hai (har sawal ek line: type text/dropdown/upload, sawal ka text <=45 chars, zaroori hai ya nahi, limit)
+PERSONALIZATION_DETAILS [BEST]:
+
+=== 10. TASVEEREN AUR VIDEO ===
+# images is product folder (ya images/ subfolder) me hain? yes/no
+IMAGES_IN_FOLDER [REQUIRED]:
+# Featured/thumbnail ke filename me "Featured" likha hai? yes/no
+FEATURED_MARKED [BEST]:
+# Size chart image: clothing/apparel me MANDATORY (yes/no/n-a). Rank 2 par lagti hai.
+SIZE_CHART [REQUIRED for apparel]:
+VIDEO [BEST]:
+# Kaunsi image kya dikhati hai (model, lifestyle, detail, packaging)? Order tay karne me madad.
+IMAGE_NOTES [BEST]:
+
+=== 11. APPAREL (sirf kapron ke liye) ===
+SIZE_RANGE [REQUIRED for apparel]:
+FABRIC_COMPOSITION [REQUIRED for apparel]:
+FIT_AND_STYLE [BEST]:
+PRINT_OR_EMBROIDERY_METHOD [BEST]:
+
+=== 12. DIGITAL (sirf digital ke liye; abbas_etsy par nahi) ===
+FILE_TYPES [REQUIRED for digital]:
+LICENSE_TERMS [BEST]:
+
+=== 13. [CLAUDE] JEWELRY STYLE MATCH (khali chhodein) ===
+STYLE_MATCH:
+VISUAL_CUES:
+
+=== 14. [CLAUDE] PRODUCT ANALYSIS (khali chhodein) ===
+# Jo Claude ne tasveer me asal me dekha (build, rang, size ke ishare, closure/hardware). SPEC_SHEET_PASTE se muqabla ho kar farq pakda jata hai.
+PRODUCT_ANALYSIS:
+
+=== 15. EXTRA ===
+# Kuch aur jo hume pata hona chahiye.
+EXTRA_NOTES:

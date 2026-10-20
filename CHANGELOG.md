@@ -4,6 +4,12 @@ Every system change (skills, guides, scripts, server code, rules) bumps `system-
 (`scripts/upgrade.mjs`) prints the entries between the installed version and the new one, so each entry says what changed **and what, if
 anything, must be done by hand** ("Migration"). Format: `## [version] - date`.
 
+## [2.3.0] - 2026-10-21
+One better intake template for every product, checked before listing.
+- `templates/product-details/product-details.txt` (v2, "KEY: value", [REQUIRED]/[BEST]/[CLAUDE] tags) replaces the separate AliExpress and Jewelry templates and adds source, buyer/occasions, USPs, keywords, risk answers (brand/AI/watermark), dimensions, cost/price, personalization details, media notes and apparel/digital extras. The stale shipping/return lines are removed.
+- `scripts/check-product-details.mjs` (missing required fields, conflicts, margin), `scripts/new-product.mjs` (create a product folder, `--refresh-templates` for the local `_template` copies).
+- Migration: run `node scripts/new-product.mjs --refresh-templates` to refresh your local `Add Product/*/_template` files (old ones are saved as `product-details.backup-<time>.txt`); products already filled in the old format keep working, Claude reads them as before.
+
 ## [2.2.0] - 2026-10-21
 Complete live-listing sync, exact clone to another account, new-listing checklist.
 - **Complete local copy of live listings**: new MCP tools `get_listing_snapshot` (everything about up to 10 listings in one labelled call) and `get_shop_profiles`; `scripts/ingest-snapshot.mjs` builds

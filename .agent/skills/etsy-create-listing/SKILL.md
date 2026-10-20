@@ -59,6 +59,8 @@ below are verified against the live Etsy API schema (`etsy-docs` MCP,
 uncertain at payload-build time, confirm via `etsy-docs` (`get_endpoint`,
 `search_etsy_api`), never guess.
 
+**Intake check (product folders, 2026-10-21):** before anything else run `node scripts/check-product-details.mjs "<product folder>"`. It lists the REQUIRED fields still missing (no draft until they are filled; `SOURCE` is a hard blocker), the conflicts to fix or confirm (returns vs the no-returns footer, a 925 claim the spec does not support, AI-looking filenames, too few images, wrong/deactivated account) and the margin (reported only: the price stays the owner's). An old-format `product-details.txt` is still read by you, but suggest `node scripts/new-product.mjs --refresh-templates` and offer to migrate it. The template: `templates/product-details/product-details.txt`.
+
 **What the owner has to provide for a new listing** (one page, by product type): `../_shared/new-listing-requirements.md`.
 
 ## Mandatory gates (single checklist — do not restate rules here)
