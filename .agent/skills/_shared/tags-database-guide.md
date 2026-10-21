@@ -135,6 +135,10 @@ If no matching category exists, say so plainly and proceed with fresh
 research — don't turn a database check into a bottleneck when there's
 nothing to reuse yet.
 
+## Keyword-sheet entries (`rings-*` categories, source `erank-sheet`)
+
+The jewelry keyword sheet (`jewelry-keywords-sheet-guide.md`) is mirrored into the bank as one category per sheet Category (`rings-ring-type`, `rings-design-motif`, `rings-stone-gem`, ...). Only keywords that are valid tags (<= 20 characters, lowercase) are stored; longer ones stay in the sheet as title phrases. These entries have `source: "erank-sheet"`, `times_seen`/`sample_size` 0 (so they never count as market-sample evidence and `status` stays `unique`) and an `erank` object with the sheet's numbers (`searches`, `clicks`, `kd`, `listings`, `ratio`, `priority`, `primary_style`, `erank_status`). `erank_status: "TO RESEARCH"` means a seed term with no eRank numbers yet. When a listing later uses one of these tags, the normal draft/publish save increments it as usual (`own_uses`). Re-sync from the sheet when it changes: same dedupe rule, update the `erank` object, never add a second entry.
+
 ## Blind spots — state plainly
 
 This database only ever contains what a user chose to save from past runs —
