@@ -4,6 +4,10 @@ Every system change (skills, guides, scripts, server code, rules) bumps `system-
 (`scripts/upgrade.mjs`) prints the entries between the installed version and the new one, so each entry says what changed **and what, if
 anything, must be done by hand** ("Migration"). Format: `## [version] - date`.
 
+## [2.5.0] - 2026-10-21
+- **Jewelry keyword sheet integrated** ("Rings Keyword Research - eRank", id `1wwyTwcAaiGOQ4J3MtbOVBLPnOy08EdcZJz2JEYexVlo`): new guide `_shared/jewelry-keywords-sheet-guide.md`, CLAUDE.md standing rule, gate B1c in `listing-gates.md`. The sheet itself was organised: `Keywords` got Category / Style Group / Primary Style / Extra Styles / Family / Flags / Ratio / Priority / Tag-ready columns, two live tabs `By Category` and `By Style` (with a style explorer) were added, wrong-intent rows are marked EXCLUDE, numbers stored as text were converted to real numbers.
+- Migration: none for the system files. Anyone using their own copy of the sheet must give the `google-sheets` MCP access to it and replace the spreadsheet id in the guide and CLAUDE.md.
+
 ## [2.4.0] - 2026-10-21
 - **Every new listing starts by asking for the product folder path** (CLAUDE.md STRICT rule, gate A0, Step 0 of `etsy-create-listing`): never guessed, and everything in the folder (images, video, text/instruction files, sheets, documents) is used. New `scripts/product-folder.mjs` resolves the path on any OS (absolute, `~`, relative, or just the folder name under `Add Product/`, also with `[draft]`/`[active]`/` - created`) and prints the full inventory, all text, the featured/size-chart/AI-looking files and the intake check.
 - Migration: none.

@@ -147,6 +147,10 @@ There is a second connected Google Sheet, separate from the "Etsy Order" sheet a
 - This is local-adjacent bookkeeping against the user's own spreadsheet, not a live Etsy write — no separate confirmation needed, same reasoning as the "Etsy Order" sheet's automatic pulls and every other mandatory local-record rule in this file (listings-record, tags-database, product-registry).
 - The sheet's own default value for a not-yet-touched product is `Ready` — never overwrite a row to `Ready` yourself, that status only exists until this system first touches that product.
 
+## Standing rule — the "Rings Keyword Research - eRank" Google Sheet is the jewelry keyword source (explicit user instruction, 2026-10-21)
+
+The owner's keyword-research sheet, spreadsheet **`1wwyTwcAaiGOQ4J3MtbOVBLPnOy08EdcZJz2JEYexVlo`** (same `google-sheets` MCP), holds eRank-researched jewelry keywords (rings today), organised by **category** and by **style** (tabs `Keywords`, `By Category`, `By Style`). For every jewelry listing (create, clone-with-rewrite, optimize, seasonal) **read it before writing the title and tags** and use its `A+ Empty niche` / `A` / `B` rows for the product's category and matched style as market evidence next to `keyword-stats.mjs`; quote the numbers from the sheet, never from memory; skip `EXCLUDE` rows; keep to its PASS rule and AVOID/branded list. When a new winning keyword is found, add it to the `Keywords` tab (no duplicates, numbers as numbers, organisation columns filled). Reading and writing this sheet is local-adjacent bookkeeping, not an Etsy call: no confirmation needed and allowed even when the owner has said "no Etsy account work". Full mechanics: `.claude/skills/_shared/jewelry-keywords-sheet-guide.md`.
+
 ## Standing rule — every draft/publish syncs its tags to the tags database, and every new draft checks the bank first (STRICT, no exceptions)
 
 This is a hard rule, not something to skip when it seems unnecessary — it applies to `etsy-create-listing`, `etsy-new-listing-copywriter`, `etsy-copy-listing`, `etsy-optimize-listing`, `etsy-seasonal-keywords`, and any ad-hoc tag edit, not just the skills that already mention it.
