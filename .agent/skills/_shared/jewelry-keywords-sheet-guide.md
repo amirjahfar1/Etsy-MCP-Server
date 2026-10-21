@@ -7,7 +7,7 @@ It is **not** an Etsy account call, so it is allowed even when the owner has sai
 
 ## Where it lives
 - Spreadsheet ID: `1wwyTwcAaiGOQ4J3MtbOVBLPnOy08EdcZJz2JEYexVlo` (different from "Etsy Order" and "Ready Products").
-- Currently covers **rings** (78 keywords, eRank Pro numbers). Other jewelry types (necklaces, earrings, bracelets) get their own sheet or tabs later; keep the same columns.
+- Currently covers **rings** (78 researched keywords with eRank Pro numbers + 73 seed terms to research). Other jewelry types (necklaces, earrings, bracelets) get their own sheet or tabs later; keep the same columns.
 
 ## Tabs
 | Tab | What it is | Edit by hand? |
@@ -23,6 +23,7 @@ It is **not** an Etsy account call, so it is allowed even when the owner has sai
 - Style names come from the 30 styles in `etsy-aesthetic-styles-guide.md` plus `Neutral / any style` (keyword fits any style, e.g. "fidget ring").
 - **Priority** (formula, do not type it): `EXCLUDE` if Flags contain EXCLUDE; `TEST`; `A+ Empty niche` = Ratio >= 0.85 and Searches >= 600; `A` = Ratio >= 0.3 and KD <= 30; `B` = Ratio >= 0.12; else `C`. Ratio = Avg Searches / Etsy Listings (demand per competing listing).
 - **Tag-ready** (formula): `YES` when the keyword is <= 20 characters and lowercase, so it can be an Etsy tag as is; `NO (N chars)` means use it in the title or shorten it.
+- **Seed terms**: 73 rows from the `Styles & Types` tab (one per style, ring type, stone, material, purpose, personalization, modifier) sit at the bottom of `Keywords` with Status `TO RESEARCH`, Priority `TO RESEARCH`, grey rows and **no eRank numbers**. They are a research to-do list, not evidence: never use them as proof of demand, and the `By Category` / `By Style` views hide them. When a seed term is researched in eRank, fill C:G, set Status to PASS/TEST and the row becomes a normal keyword (Priority recalculates, it then appears in the views).
 - **Flags**: `TOP30`, `EMPTY NICHE`, `EXCLUDE (reason)`, `TEST (reason)`, `BRAND CHECK`, `SHOP NICHE`.
 
 ## PASS rule (from the sheet's Instructions tab, unchanged)

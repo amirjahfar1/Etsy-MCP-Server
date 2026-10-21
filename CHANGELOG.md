@@ -5,7 +5,7 @@ Every system change (skills, guides, scripts, server code, rules) bumps `system-
 anything, must be done by hand** ("Migration"). Format: `## [version] - date`.
 
 ## [2.5.0] - 2026-10-21
-- **Jewelry keyword sheet integrated** ("Rings Keyword Research - eRank", id `1wwyTwcAaiGOQ4J3MtbOVBLPnOy08EdcZJz2JEYexVlo`): new guide `_shared/jewelry-keywords-sheet-guide.md`, CLAUDE.md standing rule, gate B1c in `listing-gates.md`. The sheet itself was organised: `Keywords` got Category / Style Group / Primary Style / Extra Styles / Family / Flags / Ratio / Priority / Tag-ready columns, two live tabs `By Category` and `By Style` (with a style explorer) were added, wrong-intent rows are marked EXCLUDE, numbers stored as text were converted to real numbers.
+- **Jewelry keyword sheet integrated** ("Rings Keyword Research - eRank", id `1wwyTwcAaiGOQ4J3MtbOVBLPnOy08EdcZJz2JEYexVlo`): new guide `_shared/jewelry-keywords-sheet-guide.md`, CLAUDE.md standing rule, gate B1c in `listing-gates.md`. The sheet itself was organised: `Keywords` got Category / Style Group / Primary Style / Extra Styles / Family / Flags / Ratio / Priority / Tag-ready columns, two live tabs `By Category` and `By Style` (with a style explorer) were added, wrong-intent rows are marked EXCLUDE, numbers stored as text were converted to real numbers. 73 seed terms from the `Styles & Types` tab were added to `Keywords` (Status `TO RESEARCH`, no numbers, hidden from the views) so `Keywords` is the one complete list.
 - Migration: none for the system files. Anyone using their own copy of the sheet must give the `google-sheets` MCP access to it and replace the spreadsheet id in the guide and CLAUDE.md.
 
 ## [2.4.0] - 2026-10-21
